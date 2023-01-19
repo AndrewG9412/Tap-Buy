@@ -1,0 +1,47 @@
+<resources>
+    <string name="app_name">Tap&amp;Buy</string>
+
+    <string name="login">LOGIN</string>
+    <string name="register">Non hai un account? Registrati</string>
+    <string name="registration">REGISTRATI</string>
+    <string name="mail">Email</string>
+    <string name="mail_error">Inserisci una email valida</string>
+    <string name="pwd">Password</string>
+    <string name="pwd_error">"Password di almeno 8 caratteri, una lettera maiuscola e un carattere speciale"</string>
+    <string name="login_failed">Autenticazione fallita, riprova !</string>
+    <string name="register_failed">Registrazione fallita, riprova !</string>
+    <string name="logout">Logout</string>
+    <string name="admin">admin</string>
+    <string name="user">user</string>
+
+    <string name="manage_research">Gestisci ricerche salvate</string>
+
+    <string name="myObject">I miei oggetti</string>
+    <string name="newObject">Nuovo annuncio</string>
+    <string name="nameObj">Nome oggetto :</string>
+    <string name="category">Categoria :</string>
+    <string name="tvPrice">Prezzo :</string>
+    <string name="statoObj">Stato dell\'oggetto :</string>
+    <string name="description">Descrizione :</string>
+    <string name="sendObj">Disponibilità a spedire : no   </string>
+    <string name="sendObj_yes">Disponibilità a spedire : si   </string>
+    <string name="phone">Telefono</string>
+    <string name="createAdv">Crea annuncio</string>
+    <string name="address">Indirizzo</string>
+    <string name="modify">MODIFICA</string>
+    <string name="delete">ELIMINA</string>
+
+    <string name="new_object">Nuovo</string>
+    <string name="used">Usato in perfette condizioni</string>
+    <string name="few_defects">Qualche lieve difetto</string>
+    <string name="faulty">Difettoso</string>
+    <string name="modify_cat">Modifica categorie</string>
+
+    <string-array name="object_condition">
+        <item>Nuovo</item>
+        <item>Usato in perfette condizioni</item>
+        <item>Qualche lieve difetto</item>
+        <item>Difettoso</item>
+    </string-array>
+
+</resources>

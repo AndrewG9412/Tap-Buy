@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "18155032031",
+    "project_id": "tapandbuy-cc046",
+    "storage_bucket": "tapandbuy-cc046.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:18155032031:android:ceeaacfd2f8e55206e886a",
+        "android_client_info": {
+          "package_name": "com.example.tapbuy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "18155032031-molshmttc2130lr95h2hvpj6fnhj410s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCjC1D1-R23E83hkVi5D2nbx57kmaz4z3s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "18155032031-molshmttc2130lr95h2hvpj6fnhj410s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
