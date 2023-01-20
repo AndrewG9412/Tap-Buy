@@ -41,7 +41,7 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener {
 
     private lateinit var recyclerViewMyObject : RecyclerView
     private lateinit var adapterRecycle : AdapterRecycleMyObject
-    private lateinit var listMyObject : ArrayList<MyObject>
+    private var listMyObject : ArrayList<MyObject> = ArrayList<MyObject>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

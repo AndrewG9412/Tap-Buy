@@ -1,7 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/grey">
+
+
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="170dp"
+        android:layout_height="170dp"
+        android:layout_margin="10dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btn_contact"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/dark_green"
+        android:text="@string/contact"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.169"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="592dp" />
+
+    <TextView
+        android:id="@+id/tvObjName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="name"
+        tools:layout_editor_absoluteX="198dp"
+        tools:layout_editor_absoluteY="25dp" />
+
+    <TextView
+        android:id="@+id/tvCategory"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="categoria"
+        tools:layout_editor_absoluteX="200dp"
+        tools:layout_editor_absoluteY="69dp" />
+
+    <TextView
+        android:id="@+id/tvPrice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="price"
+        tools:layout_editor_absoluteX="198dp"
+        tools:layout_editor_absoluteY="109dp" />
+
+    <TextView
+        android:id="@+id/tvCondition"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="condition"
+        tools:layout_editor_absoluteX="198dp"
+        tools:layout_editor_absoluteY="155dp" />
+
+    <TextView
+        android:id="@+id/tvAddress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="address"
+        tools:layout_editor_absoluteX="17dp"
+        tools:layout_editor_absoluteY="203dp" />
+
+    <TextView
+        android:id="@+id/tvDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="descrip"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="238dp" />
+
+    <TextView
+        android:id="@+id/tvEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="mail"
+        tools:layout_editor_absoluteX="14dp"
+        tools:layout_editor_absoluteY="277dp" />
+
+    <Button
+        android:id="@+id/btn_modify"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_modify"
+        tools:layout_editor_absoluteX="26dp"
+        tools:layout_editor_absoluteY="392dp" />
+
+    <Button
+        android:id="@+id/btn_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_delete"
+        tools:layout_editor_absoluteX="165dp"
+        tools:layout_editor_absoluteY="392dp" />
+
+    <TextView
+        android:id="@+id/tvExpedition"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="spedisce"
+        tools:layout_editor_absoluteX="13dp"
+        tools:layout_editor_absoluteY="312dp" />
+
+    <TextView
+        android:id="@+id/tvPhone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="phone"
+        tools:layout_editor_absoluteX="196dp"
+        tools:layout_editor_absoluteY="188dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

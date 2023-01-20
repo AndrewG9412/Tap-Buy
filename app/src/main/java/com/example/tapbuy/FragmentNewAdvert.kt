@@ -1,6 +1,7 @@
 package com.example.tapbuy
 
 import android.app.Activity
+import android.content.Context
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -14,17 +15,22 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.Editable
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.SwitchCompat
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.checkSelfPermission
+import androidx.core.content.ContextCompat.getSystemService
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -38,6 +44,9 @@ import com.google.android.gms.maps.model.LatLng
 import java.io.IOException
 import java.io.InputStream
 import java.net.URL
+
+import com.example.tapbuy.utils.Utils.Companion.setEditableText
+import com.google.firebase.storage.ktx.storage
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -88,8 +97,6 @@ class FragmentNewAdvert : Fragment(), AdapterView.OnItemSelectedListener {
     private lateinit var emailObj : String
     private lateinit var phoneObj : String
     private lateinit var addressObj : String
-    private lateinit var photoUrlObj : String
-
     private lateinit var listCategories : ArrayList<String>
 
     private lateinit var photo_uri : Uri
@@ -109,9 +116,9 @@ class FragmentNewAdvert : Fragment(), AdapterView.OnItemSelectedListener {
 
         auth = Firebase.auth
         db = Firebase.firestore
+        storage = Firebase.storage
         storageRef = storage.reference
         email = auth.currentUser?.email.toString()
-        requestPermission("android.permission.ACCESS_FINE_LOCATION", LOCATION_REQUEST_CODE)
         downloadCategories()
     }
 
@@ -125,6 +132,8 @@ class FragmentNewAdvert : Fragment(), AdapterView.OnItemSelectedListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        requestPermission("android.permission.ACCESS_FINE_LOCATION", LOCATION_REQUEST_CODE)
 
         ETtitleObj = view.findViewById(R.id.edNameObj)
         imageObj = view.findViewById(R.id.image_object)
@@ -159,83 +168,177 @@ class FragmentNewAdvert : Fragment(), AdapterView.OnItemSelectedListener {
         checkSwitchExpedition()
 
         btn_gallery.setOnClickListener {
-            requestPermission.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE )
-            val intent = Intent()
-                .setType("image/*")
-                .setAction(Intent.ACTION_GET_CONTENT)
-            resultIntentSelectFile.launch(Intent.createChooser(intent, "Select a file"))
+            //requestPermissionGallery.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE )
+            checkPermessoGalleria()
+            //val intent = Intent()
+             //   .setType("image/*")
+              //  .setAction(Intent.ACTION_GET_CONTENT)
+            //resultIntentSelectFile.launch(Intent.createChooser(intent, "Select a file"))
         }
 
         btn_photo.setOnClickListener {
-            requestPermission.launch(android.Manifest.permission.CAMERA)
+            //requestPermission().launch(android.Manifest.permission.CAMERA)
+            checkPermessoCamera()
             //val permissionGranted = requestCameraPermission()
             //if (permissionGranted) {
-                openCamera()
+                //openCamera()
             //}
         }
 
         btn_create.setOnClickListener{
-           createHashMapObj()
+           if(checkData()) {
+               uploadImageOnStorage()
+               createHashMapObjAndUpload()
+           }
         }
 
-        titleObj = ETtitleObj.text.toString()
-        priceObj = ETpriceObj.text.toString()
-        descriptionObj = ETdescriptionObj.text.toString()
-        emailObj = ETemailObj.text.toString()
-        phoneObj = ETphoneObj.text.toString()
-        addressObj = ETlocationObj.text.toString()
-        photoUrlObj = downloadUrlImageObj.toString()
+        btn_location.setOnClickListener{
+            val indirizzo = retrieveLocationobj()
+            ETlocationObj.setEditableText(indirizzo)
+        }
+
 
     }
 
-    private fun retrieveLocationobj() {
+
+    private fun checkData() : Boolean {
+        if (ETtitleObj.text.isEmpty()){
+            Toast.makeText(requireContext(), getString(R.string.insert_title), Toast.LENGTH_LONG).show()
+            return false
+        }
+        else titleObj =  ETtitleObj.text.toString()
+        if (ETpriceObj.text.isEmpty()){
+            Toast.makeText(requireContext(), getString(R.string.insert_price), Toast.LENGTH_LONG).show()
+            return false
+        }
+        else priceObj = ETpriceObj.text.toString()
+        if (ETdescriptionObj.text.isEmpty()){
+            Toast.makeText(requireContext(), getString(R.string.insert_description), Toast.LENGTH_LONG).show()
+            return false
+        }
+        else descriptionObj = ETdescriptionObj.text.toString()
+        if (ETemailObj.text.isEmpty()){
+            Toast.makeText(requireContext(), getString(R.string.insert_email), Toast.LENGTH_LONG).show()
+            return false
+        }
+        else emailObj = ETemailObj.text.toString()
+        if (ETphoneObj.text.isEmpty()){
+            Toast.makeText(requireContext(), getString(R.string.insert_phone), Toast.LENGTH_LONG).show()
+            return false
+        }
+        else phoneObj = ETphoneObj.text.toString()
+        if (ETlocationObj.text.isEmpty()){
+            Toast.makeText(requireContext(), getString(R.string.insert_location), Toast.LENGTH_LONG).show()
+            return false
+        }
+        else addressObj = ETlocationObj.text.toString()
+        return true
+    }
+
+    private fun checkPermessoGalleria() {
+        val permission = ContextCompat.checkSelfPermission(
+            requireContext(),
+            android.Manifest.permission.READ_EXTERNAL_STORAGE
+        )
+        if (permission == PackageManager.PERMISSION_GRANTED) {
+            val intent = Intent()
+                .setType("image/*")
+                .setAction(Intent.ACTION_PICK)
+            resultIntentSelectFile.launch(Intent.createChooser(intent, "Select a file"))
+        }
+        else {
+            requestPermission(
+                android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                1000
+            )
+            val intent = Intent()
+                .setType("image/*")
+                .setAction(Intent.ACTION_PICK)
+            resultIntentSelectFile.launch(Intent.createChooser(intent, "Select a file"))
+        }
+    }
+
+
+    private fun checkPermessoCamera() {
+        val permission = ContextCompat.checkSelfPermission(
+            requireContext(),
+            android.Manifest.permission.CAMERA
+        )
+        if (permission == PackageManager.PERMISSION_GRANTED) openCamera()
+        else {
+            requestPermission(
+                android.Manifest.permission.CAMERA,
+                CAMERA_PERMISSION_CODE
+            )
+        }
+    }
+
+    private fun retrieveLocationobj() : String   {
         val permission = ContextCompat.checkSelfPermission(
             requireContext(),
             android.Manifest.permission.ACCESS_FINE_LOCATION
         )
-
+        var address = ""
         if (permission == PackageManager.PERMISSION_GRANTED) {
+            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
-        } else {
+            fusedLocationClient.lastLocation
+                .addOnSuccessListener { location: Location? ->
+                    // Got last known location. In some rare situations this can be null.
+                    if (location != null) {
+                        val coordinates = LatLng(location.latitude, location.longitude)
+                        Log.d(TAG, "ciao")
+                        retrieveAddressFromLatLng(coordinates)
+                    }
+                }
+                .addOnFailureListener { err->
+                    Log.w(TAG, "error retrieving location : $err")
+                }
+        }
+        else {
             requestPermission(
                 android.Manifest.permission.ACCESS_FINE_LOCATION,
                 LOCATION_REQUEST_CODE
             )
         }
-
-        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-
-        fusedLocationClient.lastLocation
-            .addOnSuccessListener { location: Location? ->
-                // Got last known location. In some rare situations this can be null.
-                if (location != null) {
-                    val coordinates = LatLng(location.latitude, location.longitude)
-                    retrieveAddressFromLatLng(coordinates)
-                }
-            }
+        return address
     }
 
-    private fun retrieveAddressFromLatLng(coordinates : LatLng) : String? {
-        var geocodeMatches: List<Address>? = null
+    private fun retrieveAddressFromLatLng(coordinates : LatLng) {
+        lateinit var geocodeMatches : List<Address>
+        var indirizzo = ""
+
+        val geocodeListener = Geocoder.GeocodeListener { addresses ->
+            val via= addresses[0].getAddressLine(0)
+            val citta = addresses[0].adminArea
+            val cap = addresses[0].postalCode
+            val stato = addresses[0].countryName
+            indirizzo = "$via $citta, $cap, $stato"
+            ETlocationObj.setEditableText("")
+            ETlocationObj.setEditableText(indirizzo.toString())
+        }
+
         try {
-            geocodeMatches =
-                Geocoder(requireContext()).getFromLocation(coordinates.latitude, coordinates.longitude, 1)
-        } catch (e: IOException) {
+            val geocoder = Geocoder(requireContext())
+            if (Build.VERSION.SDK_INT >= 33) {
+                // declare here the geocodeListener, as it requires Android API 33
+                geocoder.getFromLocation(coordinates.latitude, coordinates.longitude, 1, geocodeListener)
+            } else {
+                geocodeMatches =
+                    geocoder.getFromLocation(coordinates.latitude, coordinates.longitude, 1) as List<Address>
+                    val address = geocodeMatches[0].getAddressLine(0)
+                    val citta = geocodeMatches[0].adminArea
+                    val cap = geocodeMatches[0].postalCode
+                    val stato = geocodeMatches[0].countryName
+                    indirizzo = "$address, $citta, $cap, $stato"
+                    ETlocationObj.setEditableText("")
+                    ETlocationObj.setEditableText(indirizzo)
+            }
+        }
+         catch (e: IOException) {
             e.printStackTrace()
         }
-
-        if (geocodeMatches != null) {
-            val address = geocodeMatches[0].getAddressLine(0)
-            val citta = geocodeMatches[0].adminArea
-            val cap = geocodeMatches[0].postalCode
-            val stato = geocodeMatches[0].countryName
-            val indirizzo = "$address, $citta, $cap, $stato"
-            return indirizzo
-        }
-        else return null
     }
-
-
 
     private fun requestPermission(permissionType: String, requestCode: Int) {
         ActivityCompat.requestPermissions(requireActivity(), arrayOf(permissionType), requestCode)
@@ -276,7 +379,23 @@ class FragmentNewAdvert : Fragment(), AdapterView.OnItemSelectedListener {
             }
     }
 
-    private val requestPermission =
+    /*
+    private val requestPermissionCamera =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                Log.i("DEBUG", "permission granted")
+                openCamera()
+            } else {
+                // if permission denied then check whether never ask
+                // again is selected or not by making use of
+                // !ActivityCompat.shouldShowRequestPermissionRationale(
+                // requireActivity(), Manifest.permission.CAMERA)
+                Log.i("DEBUG", "permission denied")
+            }
+        }
+    */
+
+    private val requestPermissionGallery =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
                 Log.i("DEBUG", "permission granted")
@@ -288,7 +407,9 @@ class FragmentNewAdvert : Fragment(), AdapterView.OnItemSelectedListener {
                 Log.i("DEBUG", "permission denied")
             }
         }
-    /*override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+
+    /*
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == CAMERA_PERMISSION_CODE) {
             if (grantResults.size == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
@@ -305,7 +426,7 @@ class FragmentNewAdvert : Fragment(), AdapterView.OnItemSelectedListener {
 
     private fun openCamera() {
         val values = ContentValues()
-        values.put(MediaStore.Images.Media.TITLE, titleObj.trim())
+        values.put(MediaStore.Images.Media.TITLE, "photo")
         photo_uri = requireContext().contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)!!
 
         val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
@@ -339,7 +460,7 @@ class FragmentNewAdvert : Fragment(), AdapterView.OnItemSelectedListener {
 
 
 
-    private fun createHashMapObj() {
+    private fun createHashMapObjAndUpload() {
         val map = hashMapOf<String,Any?>(
             "titolo" to titleObj,
             "categoria" to categoryObj,
@@ -347,7 +468,7 @@ class FragmentNewAdvert : Fragment(), AdapterView.OnItemSelectedListener {
             "descrizione" to descriptionObj,
             "prezzo" to priceObj,
             "condizione" to categoryObj,
-            "foto" to photoUrlObj,
+            "foto" to downloadUrlImageObj,
             "email" to emailObj,
             "telefono" to phoneObj,
             "spedire" to expeditionObj
@@ -418,6 +539,7 @@ class FragmentNewAdvert : Fragment(), AdapterView.OnItemSelectedListener {
         if (parent != null) {
             if (parent.id == R.id.spinnerCat){
                 categoryObj = parent.getItemAtPosition(position).toString()
+                spinnercategoryObj.prompt = listCategories[position]
             }
             if (parent.id == R.id.spinCondition){
                 conditionObj = parent.getItemAtPosition(position).toString()

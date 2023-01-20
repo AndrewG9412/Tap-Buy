@@ -36,6 +36,16 @@
     <string name="few_defects">Qualche lieve difetto</string>
     <string name="faulty">Difettoso</string>
     <string name="modify_cat">Modifica categorie</string>
+    <string name="insert_title">Inserisci titolo annuncio</string>
+    <string name="insert_price">Inserisci prezzo</string>
+    <string name="insert_description">Inserisci descrizione</string>
+    <string name="insert_email">Inserisci email</string>
+    <string name="insert_phone">Inserisci telefono</string>
+    <string name="insert_location">Inserisci indirizzo</string>
+    <string name="send">INVIA</string>
+    <string name="contact">Contatta venditore</string>
+    <string name="btn_delete">CANCELLA</string>
+    <string name="btn_modify">MODIFICA</string>
 
     <string-array name="object_condition">
         <item>Nuovo</item>
