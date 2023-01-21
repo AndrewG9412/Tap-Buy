@@ -46,6 +46,7 @@
     <string name="contact">Contatta venditore</string>
     <string name="btn_delete">CANCELLA</string>
     <string name="btn_modify">MODIFICA</string>
+    <string name="tvModifyObject">Modifica oggetto</string>
 
     <string-array name="object_condition">
         <item>Nuovo</item>

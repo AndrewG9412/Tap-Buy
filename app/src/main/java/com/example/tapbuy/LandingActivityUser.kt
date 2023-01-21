@@ -31,7 +31,6 @@ class LandingActivityUser : AppCompatActivity(){
         TabLayoutMediator(tabLayout, viewPager){
                 tab, position ->
             when (position){
-                0 -> tab.icon = AppCompatResources.getDrawable(this, R.drawable.home)
                 1 -> tab.icon = AppCompatResources.getDrawable(this, R.drawable.lente)
                 2 -> tab.text = getString(R.string.myObject)
                 3 -> tab.text = getString(R.string.newObject)

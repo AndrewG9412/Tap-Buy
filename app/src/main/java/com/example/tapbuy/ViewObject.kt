@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -18,8 +19,6 @@ class ViewObject : AppCompatActivity() {
 
     lateinit var viewedObj : MyObject
 
-    lateinit var btnContact : Button
-
     private lateinit var auth : FirebaseAuth
     private lateinit var db: FirebaseFirestore
 
@@ -27,6 +26,19 @@ class ViewObject : AppCompatActivity() {
     lateinit var obj : String
     lateinit var seller : String
 
+    private lateinit var tvName : TextView
+    private lateinit var tvCategory : TextView
+    private lateinit var tvPrice : TextView
+    private lateinit var tvExp : TextView
+    private lateinit var tvCondition : TextView
+    private lateinit var tvDescription : TextView
+    private lateinit var tvAddress : TextView
+    private lateinit var tvmail : TextView
+    private lateinit var tvPhone : TextView
+
+    lateinit var btnContact : Button
+    lateinit var btn_modify : Button
+    lateinit var btn_delete : Button
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
@@ -42,7 +54,19 @@ class ViewObject : AppCompatActivity() {
 
         val intentObject = getSerializable(this, "object", MyObject::class.java)
 
+        tvName = findViewById(R.id.tvObjName)
+        tvCategory = findViewById(R.id.tvCategory)
+        tvPrice = findViewById(R.id.tvPrice)
+        tvExp = findViewById(R.id.tvExpedition)
+        tvCondition = findViewById(R.id.tvCondition)
+        tvDescription = findViewById(R.id.tvDescription)
+        tvAddress = findViewById(R.id.tvAddress)
+        tvmail = findViewById(R.id.tvEmail)
+        tvPhone = findViewById(R.id.tvPhone)
+
         btnContact = findViewById(R.id.btn_contact)
+        btn_modify = findViewById(R.id.btn_modify)
+        btn_delete = findViewById(R.id.btn_delete)
 
     }
 
@@ -56,6 +80,14 @@ class ViewObject : AppCompatActivity() {
             intent.putExtra("imageObj", )
             startActivity(intent)
         }
+
+        btn_modify.setOnClickListener{
+            val intent = Intent(this, ModifyObject::class.java)
+        }
+    }
+
+    private fun checkUserForEnablingButtonSeller(){
+
     }
 
     private fun downloadObject(){

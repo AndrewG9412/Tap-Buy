@@ -8,22 +8,19 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 class PageAdapterAdmin  (private val fm: FragmentManager, private val lifecycle : Lifecycle) : FragmentStateAdapter(fm, lifecycle) {
 
     override fun getItemCount(): Int {
-        return 3
+        return 2
     }
 
     override fun createFragment(position: Int): Fragment {
         return when(position) {
             0 -> {
-                FragmentListRandomObject()
-            }
-            1 -> {
                 FragmentSearch()
             }
-            2 -> {
+            1 -> {
                 FragmentModifyCategory()
             }
             else -> {
-                FragmentListRandomObject()
+                FragmentSearch()
             }
         }
     }
