@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
     <application
         android:allowBackup="true"
@@ -21,7 +21,7 @@
         tools:targetApi="33">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBqp0Uyop5gnziixjKQNzmL27y7HYsBZXk"
+            android:value="AIzaSyDFe5tvvpRWs240Trx8QrDvRIZ8RjgIWwg"
             />
         <meta-data
             android:name="com.google.android.gms.version"
@@ -41,7 +41,8 @@
         <activity android:name=".LandingActivityAdmin"
             android:screenOrientation="portrait"/>
         <activity android:name=".LandingActivityUser"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"/>
         <activity android:name=".ManageSavedResearchActivity"
             android:screenOrientation="portrait"/>
         <activity android:name=".ViewObject"

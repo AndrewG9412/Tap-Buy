@@ -75,9 +75,9 @@ class ViewObject : AppCompatActivity() {
 
         btnContact.setOnClickListener{
             val intent = Intent(this, ChatUsers::class.java)
-            intent.putExtra("nomeObj", )
-            intent.putExtra("emailObj", auth.currentUser?.email.toString())
-            intent.putExtra("imageObj", )
+            //intent.putExtra("nomeObj", )
+           // intent.putExtra("emailObj", auth.currentUser?.email.toString())
+            //intent.putExtra("imageObj", )
             startActivity(intent)
         }
 

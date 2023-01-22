@@ -25,9 +25,6 @@ class ChatUsers : AppCompatActivity() {
     private lateinit var db: FirebaseFirestore
     private lateinit var email : String
 
-    private lateinit var recyclerChat : RecyclerView
-    private lateinit var adapterRecycle : AdapterRecycleChat
-
     private lateinit var imageObj : ImageView
     private lateinit var titleObj : TextView
     private lateinit var emailObj : TextView
@@ -45,17 +42,9 @@ class ChatUsers : AppCompatActivity() {
 
         extras = intent.extras!!
         extras.getString("nomeObj")
-        intent.getString("emailObj")
-        intent.getString("imageObj", )
+        //intent.getString("emailObj")
+        //intent.getString("imageObj", )
 
-
-        val linearLayout = LinearLayoutManager(this)
-        recyclerChat = findViewById(R.id.chat)
-        recyclerChat.layoutManager = linearLayout
-        adapterRecycle = AdapterRecycleChat(this, )
-        recyclerChat.adapter = adapterRecycle
-
-        imageObj = findViewById(R.id.image)
         titleObj = findViewById(R.id.nameObj)
         emailObj = findViewById(R.id.nameProp)
         sendMessage = findViewById(R.id.comment)
@@ -63,28 +52,25 @@ class ChatUsers : AppCompatActivity() {
     }
 
     private fun createMess(){
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-        val current = LocalDateTime.now().format(formatter)
 
         val messaggio = hashMapOf<String, Any?>(
             "user" to auth.currentUser?.email.toString(),
             "message" to sendMessage.text.toString(),
-            "time" to current
+
         )
 
-        db.collection("Chat").document(mailCompratore)
-            .collection(oggettoInteressato).document().set(messaggio)
+     //   db.collection("Chat").document(mailCompratore)
+     //       .collection(oggettoInteressato).document().set(messaggio)
     }
 
     private fun downloadMessages(){
-        db.collection("Chat").document(mailcompratore).collection(ogg)
+     //   db.collection("Chat").document(mailcompratore).collection(ogg)
     }
 
     override fun onResume() {
         super.onResume()
 
-
     }
 }
 
-data class messageChat(val user : String, val message : String, date : String)
+data class messageChat(val user : String, val message : String, val date : String)

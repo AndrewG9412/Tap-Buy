@@ -111,25 +111,26 @@ class LoginActivity : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     Log.d(TAG, "signInWithEmail:success")
+                    db.collection("Users")
+                        .document(email)
+                        .get()
+                        .addOnCompleteListener(this) { task ->
+                            if (task.isSuccessful) {
+                                if (task.result.data?.get("tipo")
+                                        ?.equals("admin") == true
+                                ) startActivity(Intent(this, LandingActivityAdmin::class.java))
+                                else startActivity(Intent(this, LandingActivityUser::class.java))
+                            }else {
+                                Log.w(TAG, "tipo non pervenuto", task.exception)
+                            }
+                        }
 
                 } else {
                     Log.w(TAG, "signInWithEmail:failure", task.exception)
                     Toast.makeText(baseContext, R.string.login_failed, Toast.LENGTH_SHORT).show()
                 }
             }
-        db.collection("Users")
-            .document(email)
-            .get()
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    if (task.result.data?.get("tipo")
-                            ?.equals("admin") == true
-                    ) startActivity(Intent(this, LandingActivityAdmin::class.java))
-                    else startActivity(Intent(this, LandingActivityUser::class.java))
-                }else {
-                    Log.w(TAG, "tipo non pervenuto", task.exception)
-                }
-            }
+
     }
 
 }

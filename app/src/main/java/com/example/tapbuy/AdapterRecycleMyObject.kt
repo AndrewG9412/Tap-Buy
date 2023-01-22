@@ -45,9 +45,9 @@ class AdapterRecycleMyObject(context: Context?, private val mList:List<MyObject>
         Picasso.get().load(itemsViewModel.photo).into(holder.imageObject)
 
         // sets the text to the textview from our itemHolder class
-        holder.textTitle.text = itemsViewModel.
+        //holder.textTitle.text = itemsViewModel.
 
-        holder.textPrice.text = itemsViewModel.
+       // holder.textPrice.text = itemsViewModel.
 
 
     }
