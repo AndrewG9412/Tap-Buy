@@ -34,6 +34,11 @@ import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.core.content.ContextCompat.getSystemService
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.work.*
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseAuth
@@ -54,6 +59,8 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Priority.PRIORITY_BALANCED_POWER_ACCURACY
 import com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY
 import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -88,7 +95,7 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback{
     private lateinit var switchExpeditionObj : SwitchCompat
     private lateinit var ETemailObj : EditText
     private lateinit var ETphoneObj : EditText
-    //lateinit var ETlocationObj: EditText
+
 
     private lateinit var btn_gallery : ImageButton
     private lateinit var btn_photo : ImageButton
@@ -110,9 +117,10 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback{
     private lateinit var selectedFile : Uri
     private lateinit var downloadUrlImageObj : String
 
+
+
     private val CAMERA_PERMISSION_CODE = 1000
     private val IMAGE_CAPTURE_CODE = 1001
-
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
 
@@ -141,6 +149,7 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback{
         val view =  inflater.inflate(R.layout.fragment_new_advert, container, false)
         spinnercategoryObj = view.findViewById(R.id.spinnerCat)
         downloadCategories(this)
+
        return view
     }
 
@@ -293,9 +302,6 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback{
                     workDataOf("latitude" to coordinates.latitude, "longitude" to coordinates.longitude)
                 ).build()
                 WorkManager.getInstance(requireContext()).enqueue(uploadWorkRequest)
-
-                //ETlocationObj.setEditableText("")
-                //ETlocationObj.setEditableText(indirizzo.toString())
             }
         }
          catch (e: IOException) {
@@ -389,7 +395,7 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback{
     }
 
 
-    private fun createBitmap(uri: Uri?) : Bitmap? {
+    /* private fun createBitmap(uri: Uri?) : Bitmap? {
         var bitmap: Bitmap? = null
         try {
             bitmap = BitmapFactory.decodeStream(URL(uri.toString()).content as InputStream)
@@ -410,7 +416,7 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback{
             e.printStackTrace()
             return null
         }
-    }
+    }*/
 
     private fun createHashMapObjAndUpload() {
         val map = hashMapOf<String,Any?>(
@@ -441,7 +447,7 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback{
 
     companion object {
 
-        lateinit var ETlocationObj: EditText
+       lateinit var ETlocationObj: EditText
         /**
          * Use this factory method to create a new instance of
          * this fragment using the provided parameters.
@@ -468,12 +474,14 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback{
                 for (category in categories){
                     val categoria = category.id
                     listCategories.add(categoria)
+                    Log.d("spinner","$listCategories")
                 }
+                callback.onDataLoaded(listCategories)
             }
             .addOnFailureListener{ err ->
                 Log.e(TAG, "Error downloading categories object : $err")
             }
-        callback.onDataLoaded(listCategories)
+
     }
 
     private fun checkSwitchExpedition() {
@@ -489,27 +497,6 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback{
         }
     }
 
-    /*
-    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        if (parent != null) {
-            if (parent.id == R.id.spinnerCat){
-                categoryObj = parent.getItemAtPosition(position).toString()
-                Log.d("spinner","$categoryObj")
-            }
-            if (parent.id == R.id.spinCondition){
-                conditionObj = parent.getItemAtPosition(position).toString()
-                Log.d("spinner","$conditionObj")
-            }
-        }
-        Log.d("spinner","sdasdasdas")
-    }
-
-    override fun onNothingSelected(parent: AdapterView<*>?) {
-        TODO("Not yet implemented")
-    }
-
-
-     */
     fun retrieveLocationAsync(context : Context, coordinates : LatLng) : String{
         val geocoder = Geocoder(context)
         lateinit var indirizzo : String
@@ -530,19 +517,18 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback{
             val latitude = inputData.keyValueMap["latitude"]
             val longitude = inputData.keyValueMap["longitude"]
             val coordinates = LatLng(latitude as Double, longitude as Double)
-            //val indirizzo = FragmentNewAdvert().retrieveLocationAsync(context, coordinates as LatLng)
             Log.d("WorkerClass","It's Working")
             ETlocationObj.setEditableText(FragmentNewAdvert().retrieveLocationAsync(context, coordinates as LatLng))
-            // Task result
             return Result.success()
         }
     }
 
     override fun onDataLoaded(data: ArrayList<String>) {
-
-        val adapterCategory = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, listCategories)
+        Log.d("ciao","ciao")
+        val adapterCategory = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, data)
         adapterCategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         //adapterCategory.notifyDataSetChanged()
+        Log.d("data","$data")
         spinnercategoryObj.adapter = adapterCategory
         spinnercategoryObj.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
 
@@ -550,9 +536,8 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback{
                 categoryObj = listCategories[position]
                 Log.d("spinner","$categoryObj")
             }
-
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                TODO("Not yet implemented")
+                Log.d("ciao","ciao")
             }
         }
     }
@@ -563,6 +548,7 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback{
 interface DownloadCategoryCallback{
     fun onDataLoaded(data : ArrayList<String>)
 }
+
 
 
 
