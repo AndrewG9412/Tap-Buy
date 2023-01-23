@@ -34,7 +34,9 @@ import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.core.content.ContextCompat.getSystemService
+import androidx.databinding.DataBindingUtil
 import androidx.work.*
+import com.example.tapbuy.databinding.FragmentNewAdvertBinding
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -104,7 +106,7 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback{
     private lateinit var emailObj : String
     private lateinit var phoneObj : String
     private lateinit var addressObj : String
-    private lateinit var listCategories : ArrayList<String>
+    lateinit var listCategories : ArrayList<String>
 
     private lateinit var photo_uri : Uri
     private lateinit var selectedFile : Uri
@@ -116,12 +118,17 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback{
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
 
+   lateinit var fragmentNewAdvertBinding : FragmentNewAdvertBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+        downloadCategories(this)
+        fragmentNewAdvertBinding = DataBindingUtil.setContentView(requireActivity(), R.layout.fragment_new_advert)
+        fragmentNewAdvertBinding.spinnerCat.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, listCategories)
 
         auth = Firebase.auth
         db = Firebase.firestore
@@ -462,7 +469,7 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback{
     }
 
     private fun downloadCategories(callback: DownloadCategoryCallback){
-        listCategories = arrayListOf()
+        listCategories = ArrayList<String>()
         db.collection("Categorie").get()
             .addOnSuccessListener { categories ->
                 for (category in categories){
@@ -540,14 +547,14 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback{
 
     override fun onDataLoaded(data: ArrayList<String>) {
 
-        val adapterCategory = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, listCategories)
+        val adapterCategory = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, data)
         adapterCategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        //adapterCategory.notifyDataSetChanged()
+        adapterCategory.notifyDataSetChanged()
         spinnercategoryObj.adapter = adapterCategory
         spinnercategoryObj.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
 
             override fun onItemSelected(parent: AdapterView<*>, v: View, position: Int, id: Long) {
-                categoryObj = listCategories[position]
+                categoryObj = data[position]
                 Log.d("spinner","$categoryObj")
             }
 
