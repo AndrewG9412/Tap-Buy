@@ -2,8 +2,11 @@ package com.example.tapbuy
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.ContentValues
+import android.content.Context.NOTIFICATION_SERVICE
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -13,7 +16,6 @@ import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.net.Uri
-import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -34,7 +36,6 @@ import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.core.content.ContextCompat.getSystemService
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
@@ -58,6 +59,7 @@ import com.example.tapbuy.utils.Utils.Companion.setEditableText
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Priority.PRIORITY_BALANCED_POWER_ACCURACY
 import com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY
+import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -72,7 +74,7 @@ private const val ARG_PARAM2 = "param2"
  * Use the [FragmentNewAdvert.newInstance] factory method to
  * create an instance of this fragment.
  */
-class FragmentNewAdvert : Fragment(), DownloadCategoryCallback{
+class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnStorageCallback {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -117,7 +119,7 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback{
     private lateinit var selectedFile : Uri
     private lateinit var downloadUrlImageObj : String
 
-
+    private lateinit var notificationManager : NotificationManager
 
     private val CAMERA_PERMISSION_CODE = 1000
     private val IMAGE_CAPTURE_CODE = 1001
@@ -136,7 +138,6 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback{
         storage = Firebase.storage
         storageRef = storage.reference
         email = auth.currentUser?.email.toString()
-
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
     }
@@ -185,6 +186,7 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback{
         btn_location = view.findViewById(R.id.btn_location)
         btn_create = view.findViewById(R.id.buttonCreate)
 
+        notificationManager = this.activity?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
 
 
@@ -207,8 +209,7 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback{
 
         btn_create.setOnClickListener{
            if(checkData()) {
-               uploadImageOnStorage()
-               createHashMapObjAndUpload()
+               uploadImageOnStorage(this)
            }
         }
 
@@ -329,7 +330,7 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback{
         }
     }
 
-    private fun uploadImageOnStorage(){
+    private fun uploadImageOnStorage(callback : UploadImageOnStorageCallback){
         val fileRef = storageRef.child("$email/$titleObj.png")
         val fileImageRef = storageRef.child("${imageObj.tag}/$email/$titleObj.png")
         fileImageRef.putFile(imageObj.tag!! as Uri)
@@ -339,6 +340,7 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback{
                     .addOnSuccessListener { uri ->
                         downloadUrlImageObj = uri.toString()
                         Log.d("Firebase", "File loc: ${uri.path}")
+                        callback.receivedDownloadUrl(downloadUrlImageObj)
                     }
                     .addOnFailureListener {
                         Log.d("Firebase", "download failed")
@@ -418,7 +420,7 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback{
         }
     }*/
 
-    private fun createHashMapObjAndUpload() {
+    private fun createHashMapObjAndUpload(downloadUrlImage: String) {
         val map = hashMapOf<String,Any?>(
             "titolo" to titleObj,
             "categoria" to categoryObj,
@@ -426,12 +428,10 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback{
             "descrizione" to descriptionObj,
             "prezzo" to priceObj,
             "condizione" to categoryObj,
-            "foto" to downloadUrlImageObj,
+            "foto" to downloadUrlImage,
             "email" to emailObj,
             "telefono" to phoneObj,
             "spedire" to expeditionObj
-
-
         )
         db.collection("Oggetti").document(email)
             .collection("miei_oggetti").document(titleObj).set(map)
@@ -441,6 +441,40 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback{
             .addOnFailureListener { e ->
                 Log.w(TAG, "Errore eggiunta oggetto: $e", e)
             }
+
+        db.collection("Chat").document("${emailObj}_${titleObj}")
+            .collection("chat").addSnapshotListener { snapshots, e ->
+                if (e != null) {
+                    Log.d(TAG, "Cannot listen on firestore!!.")
+                    return@addSnapshotListener
+                }
+
+                for (dc in snapshots!!.documentChanges) {
+                    when (dc.type) {
+                        DocumentChange.Type.ADDED -> {
+                            Log.d("quoteListener", "New quote: ${dc.document.data}")
+                            createNotification("Chat")
+
+
+                        }
+                        DocumentChange.Type.MODIFIED -> {}          ////////////////////////////////////////////////////////////////////////////////////////////
+                        DocumentChange.Type.REMOVED -> {}
+                    }
+                }
+            }
+
+    }
+
+    private fun createNotificationChannel(id: String, name: String, description: String) {
+        val importance = NotificationManager.IMPORTANCE_LOW
+        val channel = NotificationChannel(id, name, importance)
+        channel.description = description
+        notificationManager?.createNotificationChannel(channel)
+    }
+
+
+    private fun createNotification(channelName : String){
+    
 
     }
 
@@ -542,6 +576,9 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback{
         }
     }
 
+    override fun receivedDownloadUrl(downloadUrl : String){
+        createHashMapObjAndUpload(downloadUrl)
+    }
 
 }
 
@@ -549,6 +586,9 @@ interface DownloadCategoryCallback{
     fun onDataLoaded(data : ArrayList<String>)
 }
 
+interface UploadImageOnStorageCallback{
+    fun receivedDownloadUrl(downloadUrl : String)
+}
 
 
 
