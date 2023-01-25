@@ -55,4 +55,10 @@
         <item>Difettoso</item>
     </string-array>
 
+    <string-array name="Price_choose">
+        <item>Prezzo massimo:</item>
+        <item>Prezzo minimo:</item>
+        <item>Range di prezzo:</item>
+    </string-array>
+
 </resources>
