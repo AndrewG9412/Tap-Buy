@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
     <application
         android:allowBackup="true"
@@ -19,6 +20,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TapBuy"
         tools:targetApi="33">
+        <service android:name= ".ListenerForegroundChat" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDFe5tvvpRWs240Trx8QrDvRIZ8RjgIWwg"

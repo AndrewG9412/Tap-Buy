@@ -2,16 +2,14 @@ package com.example.tapbuy
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.ActivityManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Context
 import android.content.ContentValues
-import android.content.Context.NOTIFICATION_SERVICE
+import android.content.Context
+import android.content.Context.ACTIVITY_SERVICE
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Matrix
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
@@ -19,29 +17,24 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.text.Editable
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.SwitchCompat
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.core.content.ContextCompat.getSystemService
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.core.content.ContextCompat.startForegroundService
+import androidx.fragment.app.Fragment
 import androidx.work.*
+import com.example.tapbuy.utils.Utils.Companion.setEditableText
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -49,20 +42,9 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
-import com.google.android.gms.maps.model.LatLng
-
-import java.io.IOException
-import java.io.InputStream
-import java.net.URL
-
-import com.example.tapbuy.utils.Utils.Companion.setEditableText
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.Priority.PRIORITY_BALANCED_POWER_ACCURACY
-import com.google.android.gms.location.Priority.PRIORITY_HIGH_ACCURACY
-import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.storage.ktx.storage
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import java.io.IOException
+
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -421,7 +403,7 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
     }*/
 
     private fun createHashMapObjAndUpload(downloadUrlImage: String) {
-        val map = hashMapOf<String,Any?>(
+        val map = hashMapOf<String, Any?>(
             "titolo" to titleObj,
             "categoria" to categoryObj,
             "indirizzo" to addressObj,
@@ -442,28 +424,22 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
                 Log.w(TAG, "Errore eggiunta oggetto: $e", e)
             }
 
-        db.collection("Chat").document("${emailObj}_${titleObj}")
-            .collection("chat").addSnapshotListener { snapshots, e ->
-                if (e != null) {
-                    Log.d(TAG, "Cannot listen on firestore!!.")
-                    return@addSnapshotListener
-                }
-
-                for (dc in snapshots!!.documentChanges) {
-                    when (dc.type) {
-                        DocumentChange.Type.ADDED -> {
-                            Log.d("quoteListener", "New quote: ${dc.document.data}")
-                            createNotification("Chat")
-
-
-                        }
-                        DocumentChange.Type.MODIFIED -> {}          ////////////////////////////////////////////////////////////////////////////////////////////
-                        DocumentChange.Type.REMOVED -> {}
-                    }
-                }
-            }
+        val serviceIntent = Intent(requireContext(), ListenerForegroundChat::class.java)
+        startForegroundService(requireContext(), serviceIntent)
 
     }
+
+    fun foregroundServiceRunning(): Boolean {
+        val activityManager = getSystemService(requireContext(), Context.ACTIVITY_SERVICE) as ActivityManager?
+        @Suppress("DEPRECATION")
+        for (service in activityManager!!.getRunningServices(Int.MAX_VALUE)) {
+            if (MyForegroundService::class.java.getName() == service.service.className) {
+                return true
+            }
+        }
+        return false
+    }
+
 
     private fun createNotificationChannel(id: String, name: String, description: String) {
         val importance = NotificationManager.IMPORTANCE_LOW
@@ -589,6 +565,7 @@ interface DownloadCategoryCallback{
 interface UploadImageOnStorageCallback{
     fun receivedDownloadUrl(downloadUrl : String)
 }
+
 
 
 
