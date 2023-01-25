@@ -429,16 +429,16 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
 
     }
 
-    fun foregroundServiceRunning(): Boolean {
-        val activityManager = getSystemService(requireContext(), Context.ACTIVITY_SERVICE) as ActivityManager?
+   /* fun foregroundServiceRunning(): Boolean {
+        val activityManager = getSystemService(requireContext(), ListenerForegroundChat) as ActivityManager?
         @Suppress("DEPRECATION")
         for (service in activityManager!!.getRunningServices(Int.MAX_VALUE)) {
-            if (MyForegroundService::class.java.getName() == service.service.className) {
+            if (ListenerForegroundChat::class.java.getName() == service.service.className) {
                 return true
             }
         }
         return false
-    }
+    }*/
 
 
     private fun createNotificationChannel(id: String, name: String, description: String) {
