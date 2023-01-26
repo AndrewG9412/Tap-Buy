@@ -119,14 +119,14 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
         email = auth.currentUser?.email.toString()
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-
-        if (!foregroundServiceRunning()) {
+// qua per come è fatto non va bene, penso sia un attimo da rivedere come e quando richiamare il service
+        /*if (!foregroundServiceRunning()) {
             val serviceIntent = Intent(
                 requireContext(),
                 ListenerForegroundChat::class.java
             )
             startForegroundService(requireContext(),serviceIntent)
-        }
+        }*/
     }
 
     override fun onCreateView(
@@ -414,7 +414,7 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
             "indirizzo" to addressObj,
             "descrizione" to descriptionObj,
             "prezzo" to priceObj,
-            "condizione" to categoryObj,
+            "condizione" to conditionObj,
             "foto" to downloadUrlImage,
             "email" to emailObj,
             "telefono" to phoneObj,
@@ -429,8 +429,11 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
                 Log.w(TAG, "Errore eggiunta oggetto: $e", e)
             }
 
-        val serviceIntent = Intent(requireContext(), ListenerForegroundChat::class.java)
-        startForegroundService(requireContext(), serviceIntent)
+        /*val serviceIntent = Intent(requireContext(), ListenerForegroundChat::class.java)
+        serviceIntent.putExtra("emailSeller", emailObj )
+        serviceIntent.putExtra("titleObj", titleObj )
+        startForegroundService(requireContext(), serviceIntent)*/
+
 
     }
 
@@ -485,6 +488,7 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
     }
 
     private fun checkSwitchExpedition() {
+        expeditionObj = "false"
         switchExpeditionObj.setOnCheckedChangeListener { compoundButton:
                                                          CompoundButton, value: Boolean ->
             if (value) {

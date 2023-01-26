@@ -28,7 +28,7 @@ private const val ARG_PARAM2 = "param2"
  * Use the [FragmentMyObject.newInstance] factory method to
  * create an instance of this fragment.
  */
-class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener {
+class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener, DownloadDataCallback {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -41,7 +41,7 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener {
 
     private lateinit var recyclerViewMyObject : RecyclerView
     private lateinit var adapterRecycle : AdapterRecycleMyObject
-    private var listMyObject : ArrayList<MyObject> = ArrayList<MyObject>()
+    private var listMyObject : ArrayList<MyObject> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,8 +69,8 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener {
         recyclerViewMyObject.layoutManager = linearLayout
         adapterRecycle = AdapterRecycleMyObject(context, listMyObject)
         recyclerViewMyObject.adapter = adapterRecycle
-
         adapterRecycle.setClickListener(this)
+        //downloadListMyObject(db, email, this)
     }
 
     companion object {
@@ -93,7 +93,7 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener {
             }
     }
 
-    private fun downloadListMyObject(db : FirebaseFirestore, email : String) : List<MyObject> {
+     private fun downloadListMyObject(db : FirebaseFirestore, email : String, callback: DownloadDataCallback){
         listMyObject = arrayListOf()
         db.collection("Oggetti").document(email).collection("miei_oggetti")
             .get().addOnSuccessListener {result ->
@@ -115,12 +115,13 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener {
                     }
                 listMyObject.add(obj)
                 }
+                callback.oneDataDownloaded(listMyObject)
             }
             .addOnFailureListener { err ->
                 Log.e(TAG, "Error retrieving Object from Firestore: $err")
 
             }
-        return listMyObject
+
     }
 
     override fun onItemClick(view: View?, position: Int) {
@@ -129,4 +130,16 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener {
         intent.putExtra("object", clickedObj)
         startActivity(intent)
     }
+
+    override fun oneDataDownloaded(data: ArrayList<MyObject>) {
+        adapterRecycle = AdapterRecycleMyObject(context, data)
+        recyclerViewMyObject.adapter = adapterRecycle
+
+        adapterRecycle.setClickListener(this)
+
+    }
+}
+
+interface DownloadDataCallback{
+    fun oneDataDownloaded(data : ArrayList<MyObject>)
 }
