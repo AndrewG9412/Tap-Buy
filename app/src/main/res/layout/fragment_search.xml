@@ -8,26 +8,15 @@
     tools:context=".FragmentSearch">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
-        <SeekBar
-            android:id="@+id/rangeSeekbar1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:max="100"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.952" />
 
         <TextView
             android:id="@+id/titleScreen"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ricerca per:"
+            android:text="@string/search_for"
             android:textColor="@color/black"
             android:textSize="23sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -71,7 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
-            android:text="Distanza in km da me:"
+            android:text="@string/distance_for"
             android:textColor="@color/black"
             android:textSize="15sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -141,7 +130,7 @@
             android:layout_marginTop="25dp"
             android:layout_marginBottom="50dp"
             android:backgroundTint="@color/dark_green"
-            android:text="Ricerca"
+            android:text="@string/btn_research"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.843"
@@ -149,6 +138,16 @@
             app:layout_constraintTop_toBottomOf="@+id/Price"
             app:layout_constraintVertical_bias="0.0" />
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/buttonResearch"
+            app:layout_constraintVertical_bias="1.0" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 </FrameLayout>

@@ -1,10 +1,7 @@
 package com.example.tapbuy
 
-import android.R
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.Service
+import android.app.*
+import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import android.util.Log
@@ -16,9 +13,13 @@ import com.google.firebase.ktx.Firebase
 class ListenerForegroundChat(mailSeller : String, nameObj : String) : Service() {
 
     val TAG = "ListenerBackgroundChat"
+    var mailSeller : String
+    var nameObj : String
 
-    val mailSeller = mailSeller
-    val nameObj = nameObj
+    init {
+        this.mailSeller = mailSeller
+        this.nameObj = nameObj
+    }
 
     var db = Firebase.firestore
 
@@ -38,9 +39,9 @@ class ListenerForegroundChat(mailSeller : String, nameObj : String) : Service() 
                             when (dc.type) {
                                 DocumentChange.Type.ADDED -> {
                                     //Log.d("quoteListener", "New quote: ${dc.document.data}")
-                                    createNotification("Chat")
+                                    createNotification("Chat", dc.document.id)
                                 }
-                                DocumentChange.Type.MODIFIED -> {}          ////////////////////////////////////////////////////////////////////////////////////////////
+                                DocumentChange.Type.MODIFIED -> {}
                                 DocumentChange.Type.REMOVED -> {}
                             }
                         }
@@ -66,6 +67,34 @@ class ListenerForegroundChat(mailSeller : String, nameObj : String) : Service() 
             .setContentTitle("Service enabled")
         startForeground(1001, notification.build())
         return super.onStartCommand(intent, flags, startId)
+    }
+
+    private fun createNotification(channelId: String, idDoc : String) {
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val importance = NotificationManager.IMPORTANCE_LOW
+        val channel = NotificationChannel(channelId, channelId, importance)
+        notificationManager.createNotificationChannel(channel)
+
+        val resultIntent = Intent(this, ChatUsers::class.java )
+        resultIntent.putExtra("buyer_id_document", idDoc )
+
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            0,
+            resultIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+
+        val notification = Notification.Builder(this, channelId)
+            .setContentTitle(getString(R.string.received_message))
+            .setContentText("${getString(R.string.message_for)} ${nameObj}")
+            .setChannelId(channelId)
+            .setContentIntent(pendingIntent)
+            .build()
+        notificationManager.notify((Math.random() % 10000).toInt(), notification)
+
+
     }
 
     override fun onBind(intent: Intent?): IBinder? {

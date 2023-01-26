@@ -47,6 +47,11 @@
     <string name="btn_delete">CANCELLA</string>
     <string name="btn_modify">MODIFICA</string>
     <string name="tvModifyObject">Modifica oggetto</string>
+    <string name="search_for">Ricerca per :</string>
+    <string name="distance_for">Distanza in km da me :</string>
+    <string name="btn_research">Ricerca</string>
+    <string name="received_message">Hai ricevuto un messaggio !</string>
+    <string name="message_for">"Messaggio relativo all'oggetto : "</string>
 
     <string-array name="object_condition">
         <item>Nuovo</item>

@@ -3,11 +3,9 @@ package com.example.tapbuy
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ActivityManager
-import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.ContentValues
 import android.content.Context
-import android.content.Context.ACTIVITY_SERVICE
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Address
@@ -26,7 +24,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.ContextCompat.startForegroundService
 import androidx.fragment.app.Fragment
 import androidx.work.*
@@ -122,6 +119,14 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
         email = auth.currentUser?.email.toString()
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+
+        if (!foregroundServiceRunning()) {
+            val serviceIntent = Intent(
+                requireContext(),
+                ListenerForegroundChat::class.java
+            )
+            startForegroundService(requireContext(),serviceIntent)
+        }
     }
 
     override fun onCreateView(
@@ -429,31 +434,16 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
 
     }
 
-   /* fun foregroundServiceRunning(): Boolean {
-        val activityManager = getSystemService(requireContext(), ListenerForegroundChat) as ActivityManager?
+    fun foregroundServiceRunning(): Boolean {
+        val activityManager = requireContext().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?
         @Suppress("DEPRECATION")
         for (service in activityManager!!.getRunningServices(Int.MAX_VALUE)) {
-            if (ListenerForegroundChat::class.java.getName() == service.service.className) {
+            if (ListenerForegroundChat::class.java.name == service.service.className) {
                 return true
             }
         }
         return false
-    }*/
-
-
-    private fun createNotificationChannel(id: String, name: String, description: String) {
-        val importance = NotificationManager.IMPORTANCE_LOW
-        val channel = NotificationChannel(id, name, importance)
-        channel.description = description
-        notificationManager?.createNotificationChannel(channel)
     }
-
-
-    private fun createNotification(channelName : String){
-    
-
-    }
-
 
     companion object {
 
