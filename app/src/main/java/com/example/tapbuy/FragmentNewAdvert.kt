@@ -430,7 +430,10 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
             }
 
         val serviceIntent = Intent(requireContext(), ListenerForegroundChat::class.java)
+        serviceIntent.putExtra("emailSeller", emailObj )
+        serviceIntent.putExtra("titleObj", titleObj )
         startForegroundService(requireContext(), serviceIntent)
+
 
     }
 

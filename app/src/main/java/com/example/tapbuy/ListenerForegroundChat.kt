@@ -3,6 +3,7 @@ package com.example.tapbuy
 import android.app.*
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
 import com.google.firebase.firestore.DocumentChange
@@ -10,17 +11,13 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 
-class ListenerForegroundChat(mailSeller : String, nameObj : String) : Service() {
+class ListenerForegroundChat(/*mailSeller : String, nameObj : String*/) : Service() {
 
     val TAG = "ListenerBackgroundChat"
-    var mailSeller : String
-    var nameObj : String
 
-    init {
-        this.mailSeller = mailSeller
-        this.nameObj = nameObj
-    }
-
+    lateinit var extras : Bundle
+    lateinit var mailSeller : String
+    lateinit var nameObj : String
     var db = Firebase.firestore
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -98,6 +95,11 @@ class ListenerForegroundChat(mailSeller : String, nameObj : String) : Service() 
     }
 
     override fun onBind(intent: Intent?): IBinder? {
+        if (intent != null) {
+            extras = intent.extras!!
+            this.mailSeller = extras.getString("emailSeller").toString()
+            this.nameObj = extras.getString("titleObj").toString()
+        }
         return null
     }
 
