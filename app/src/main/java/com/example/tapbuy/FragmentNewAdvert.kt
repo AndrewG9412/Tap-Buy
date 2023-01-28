@@ -94,6 +94,9 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
     private lateinit var addressObj : String
     private lateinit var listCategories : ArrayList<String>
 
+    private lateinit var latitude : String
+    private lateinit var longitude : String
+
     private lateinit var photo_uri : Uri
     private lateinit var selectedFile : Uri
     private lateinit var downloadUrlImageObj : String
@@ -119,14 +122,6 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
         email = auth.currentUser?.email.toString()
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-// qua per come è fatto non va bene, penso sia un attimo da rivedere come e quando richiamare il service
-        /*if (!foregroundServiceRunning()) {
-            val serviceIntent = Intent(
-                requireContext(),
-                ListenerForegroundChat::class.java
-            )
-            startForegroundService(requireContext(),serviceIntent)
-        }*/
     }
 
     override fun onCreateView(
@@ -252,6 +247,8 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
                 .addOnSuccessListener { location: Location? ->
                     // Got last known location. In some rare situations this can be null.
                     if (location != null) {
+                        latitude = location.latitude.toString()
+                        longitude = location.longitude.toString()
                         val coordinates = LatLng(location.latitude, location.longitude)
                         Log.d(TAG, "${location.latitude}")
                         retrieveAddressFromLatLng(coordinates)
@@ -382,30 +379,6 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
         resultIntentShootPhoto.launch(cameraIntent)
     }
 
-
-    /* private fun createBitmap(uri: Uri?) : Bitmap? {
-        var bitmap: Bitmap? = null
-        try {
-            bitmap = BitmapFactory.decodeStream(URL(uri.toString()).content as InputStream)
-            val newWidth = 170
-            val newHeight = 170
-            val width = bitmap.width
-            val height = bitmap.height
-
-            val scaleWidth = newWidth.toFloat() / width
-            val scaleHeight = newHeight.toFloat() / height
-
-            val matrix = Matrix()
-            matrix.postScale(scaleWidth, scaleHeight)
-
-            return Bitmap.createBitmap(bitmap,0,0,width, height, matrix, false)
-        }
-        catch (e: Exception) {
-            e.printStackTrace()
-            return null
-        }
-    }*/
-
     private fun createHashMapObjAndUpload(downloadUrlImage: String) {
         val venduto  = "false"
         val map = hashMapOf<String, Any?>(
@@ -419,7 +392,10 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
             "email" to emailObj,
             "telefono" to phoneObj,
             "spedire" to expeditionObj,
-            "venduto" to venduto
+            "venduto" to venduto,
+            "mailVendAuth" to email,
+            "latitudine" to latitude,
+            "logitudine" to longitude
         )
         db.collection("Oggetti").document(email)
             .collection("miei_oggetti").document(titleObj).set(map)
@@ -430,25 +406,19 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
                 Log.w(TAG, "Errore eggiunta oggetto: $e", e)
             }
 
-        /*val serviceIntent = Intent(requireContext(), ListenerForegroundChat::class.java)
+        val mapChat = hashMapOf<String, Any?>(
+            "mail" to email,
+            "message" to "")
+
+        db.collection("Chat").document(auth.currentUser?.email.toString()).collection("oggetti").document(
+            titleObj
+        )
+            .collection("chat").document(auth.currentUser?.uid.toString()).set(mapChat)
+        val serviceIntent = Intent(requireContext(), ListenerForegroundChat::class.java)
         serviceIntent.putExtra("emailSeller", emailObj )
         serviceIntent.putExtra("titleObj", titleObj )
-        startForegroundService(requireContext(), serviceIntent)*/
-
-
+        startForegroundService(requireContext(), serviceIntent)
     }
-
-    fun foregroundServiceRunning(): Boolean {
-        val activityManager = requireContext().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?
-        @Suppress("DEPRECATION")
-        for (service in activityManager!!.getRunningServices(Int.MAX_VALUE)) {
-            if (ListenerForegroundChat::class.java.name == service.service.className) {
-                return true
-            }
-        }
-        return false
-    }
-
     companion object {
 
        lateinit var ETlocationObj: EditText

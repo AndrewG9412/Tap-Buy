@@ -1,7 +1,11 @@
 package com.example.tapbuy
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.ActivityManager
+import android.app.NotificationManager
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -23,18 +27,27 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.work.*
+import com.example.tapbuy.FragmentNewAdvert.Companion.ETlocationObj
+
 import com.example.tapbuy.utils.Utils.Companion.setEditableText
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.ktx.storage
 import java.io.IOException
 import java.io.InputStream
 import java.net.URL
 
-class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener {
+class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener, DownloadCategoryCallback, UploadImageOnStorageCallback {
 
     private val LOCATION_REQUEST_CODE = 101
 
@@ -50,12 +63,14 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     private lateinit var imageObj : ImageView
     private lateinit var spinnercategoryObj : Spinner
     private lateinit var ETpriceObj : EditText
+    private lateinit var ETlocationObj: EditText
+
     private lateinit var spinnerConditionObj : Spinner
     private lateinit var ETdescriptionObj : EditText
     private lateinit var switchExpeditionObj : SwitchCompat
     private lateinit var ETemailObj : EditText
     private lateinit var ETphoneObj : EditText
-    private lateinit var ETlocationObj : EditText
+
 
     private lateinit var btn_gallery : ImageButton
     private lateinit var btn_photo : ImageButton
@@ -73,30 +88,57 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     private lateinit var addressObj : String
     private lateinit var listCategories : ArrayList<String>
 
+    private lateinit var latitude : String
+    private lateinit var longitude : String
+
     private lateinit var photo_uri : Uri
     private lateinit var selectedFile : Uri
     private lateinit var downloadUrlImageObj : String
 
+    private lateinit var notificationManager : NotificationManager
+
     private val CAMERA_PERMISSION_CODE = 1000
     private val IMAGE_CAPTURE_CODE = 1001
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
-        setContentView(R.layout.activity_modify_object)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
+        auth = Firebase.auth
+        db = Firebase.firestore
+        storage = Firebase.storage
+        storageRef = storage.reference
+        email = auth.currentUser?.email.toString()
+
+        spinnercategoryObj = findViewById(R.id.spinnerCat)
+        downloadCategories(this)
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+// qua per come è fatto non va bene, penso sia un attimo da rivedere come e quando richiamare il service
+        /*if (!foregroundServiceRunning()) {
+            val serviceIntent = Intent(
+                requireContext(),
+                ListenerForegroundChat::class.java
+            )
+            startForegroundService(requireContext(),serviceIntent)
+        }*/
         ETtitleObj = findViewById(R.id.edNameObj)
         imageObj = findViewById(R.id.image_object)
-        spinnercategoryObj = findViewById(R.id.spinnerCat)
-        val adapterCategory = ArrayAdapter(this, android.R.layout.simple_spinner_item, listCategories)
-        adapterCategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnercategoryObj.adapter = adapterCategory;
-        spinnercategoryObj.onItemSelectedListener = this
+
         ETpriceObj = findViewById(R.id.editPrice)
         spinnerConditionObj = findViewById(R.id.spinCondition)
         val adapterCondition = ArrayAdapter(this, android.R.layout.simple_spinner_item, resources.getStringArray(R.array.object_condition))
         adapterCondition.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerConditionObj.adapter = adapterCondition
-        spinnercategoryObj.onItemSelectedListener = this
+        spinnerConditionObj.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+
+            override fun onItemSelected(parent: AdapterView<*>, v: View, position: Int, id: Long) {
+                conditionObj = parent.getItemAtPosition(position).toString()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
         ETdescriptionObj = findViewById(R.id.etDescription)
         switchExpeditionObj = findViewById(R.id.sendObj)
         ETemailObj = findViewById(R.id.etEmail)
@@ -106,33 +148,38 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         btn_gallery = findViewById(R.id.btn_gallery)
         btn_photo = findViewById(R.id.btn_photo)
         btn_location = findViewById(R.id.btn_location)
-        btn_create = findViewById(R.id.buttonModify)
-        downloadCategories()
+        btn_create = findViewById(R.id.buttonCreate)
+
+        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     }
 
     override fun onResume() {
         super.onResume()
 
+
         checkSwitchExpedition()
 
         btn_gallery.setOnClickListener {
-            checkPermessoGalleria()
+            if (Build.VERSION.SDK_INT >= 33) {
+                requestPermissionGallery.launch(android.Manifest.permission.READ_MEDIA_IMAGES)
+            } else {
+                requestPermissionGallery.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
         }
 
         btn_photo.setOnClickListener {
-            checkPermessoCamera()
+            requestPermissionCamera.launch(android.Manifest.permission.CAMERA)
         }
 
         btn_create.setOnClickListener{
             if(checkData()) {
-                uploadImageOnStorage()
-                createHashMapObjAndUpload()
+                uploadImageOnStorage(this)
             }
         }
 
         btn_location.setOnClickListener{
-            val indirizzo = retrieveLocationobj()
-            ETlocationObj.setEditableText(indirizzo)
+            ETlocationObj.setEditableText("")
+            retrieveLocationobj()
         }
     }
 
@@ -170,59 +217,21 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         return true
     }
 
-    private fun checkPermessoGalleria() {
-        val permission = ContextCompat.checkSelfPermission(
-            this,
-            android.Manifest.permission.READ_EXTERNAL_STORAGE
-        )
-        if (permission == PackageManager.PERMISSION_GRANTED) {
-            val intent = Intent()
-                .setType("image/*")
-                .setAction(Intent.ACTION_PICK)
-            resultIntentSelectFile.launch(Intent.createChooser(intent, "Select a file"))
-        }
-        else {
-            requestPermission(
-                android.Manifest.permission.READ_EXTERNAL_STORAGE,
-                1000
-            )
-            val intent = Intent()
-                .setType("image/*")
-                .setAction(Intent.ACTION_PICK)
-            resultIntentSelectFile.launch(Intent.createChooser(intent, "Select a file"))
-        }
-    }
-
-
-    private fun checkPermessoCamera() {
-        val permission = ContextCompat.checkSelfPermission(
-            this,
-            android.Manifest.permission.CAMERA
-        )
-        if (permission == PackageManager.PERMISSION_GRANTED) openCamera()
-        else {
-            requestPermission(
-                android.Manifest.permission.CAMERA,
-                CAMERA_PERMISSION_CODE
-            )
-        }
-    }
-
-    private fun retrieveLocationobj() : String   {
+    private fun retrieveLocationobj()  {
         val permission = ContextCompat.checkSelfPermission(
             this,
             android.Manifest.permission.ACCESS_FINE_LOCATION
         )
-        var address = ""
-        if (permission == PackageManager.PERMISSION_GRANTED) {
-            val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-            fusedLocationClient.lastLocation
+        if (permission == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
                 .addOnSuccessListener { location: Location? ->
                     // Got last known location. In some rare situations this can be null.
                     if (location != null) {
+                        latitude = location.latitude.toString()
+                        longitude = location.longitude.toString()
                         val coordinates = LatLng(location.latitude, location.longitude)
-                        Log.d(TAG, "ciao")
+                        Log.d(TAG, "${location.latitude}")
                         retrieveAddressFromLatLng(coordinates)
                     }
                 }
@@ -236,38 +245,28 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 LOCATION_REQUEST_CODE
             )
         }
-        return address
     }
 
-    private fun retrieveAddressFromLatLng(coordinates : LatLng) {
+
+    @SuppressLint("RestrictedApi")
+    private fun retrieveAddressFromLatLng(coordinates: LatLng) {
         lateinit var geocodeMatches : List<Address>
         var indirizzo = ""
-
-        val geocodeListener = Geocoder.GeocodeListener { addresses ->
-            val via= addresses[0].getAddressLine(0)
-            val citta = addresses[0].adminArea
-            val cap = addresses[0].postalCode
-            val stato = addresses[0].countryName
-            indirizzo = "$via $citta, $cap, $stato"
-            ETlocationObj.setEditableText("")
-            ETlocationObj.setEditableText(indirizzo.toString())
-        }
-
         try {
             val geocoder = Geocoder(this)
             if (Build.VERSION.SDK_INT >= 33) {
                 // declare here the geocodeListener, as it requires Android API 33
+                val geocodeListener = Geocoder.GeocodeListener { addresses ->
+                    indirizzo = addresses[0].getAddressLine(0)
+                    ETlocationObj.setEditableText(indirizzo)
+                }
                 geocoder.getFromLocation(coordinates.latitude, coordinates.longitude, 1, geocodeListener)
-            } else {
-                geocodeMatches =
-                    geocoder.getFromLocation(coordinates.latitude, coordinates.longitude, 1) as List<Address>
-                val address = geocodeMatches[0].getAddressLine(0)
-                val citta = geocodeMatches[0].adminArea
-                val cap = geocodeMatches[0].postalCode
-                val stato = geocodeMatches[0].countryName
-                indirizzo = "$address, $citta, $cap, $stato"
-                ETlocationObj.setEditableText("")
-                ETlocationObj.setEditableText(indirizzo)
+            }
+            else {
+                val uploadWorkRequest = OneTimeWorkRequest.Builder(WorkerLocationClass::class.java).setInputData(
+                    workDataOf("latitude" to coordinates.latitude, "longitude" to coordinates.longitude)
+                ).build()
+                WorkManager.getInstance(this).enqueue(uploadWorkRequest)
             }
         }
         catch (e: IOException) {
@@ -284,6 +283,7 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             selectedFile = result.data?.data!!
             imageObj.setImageURI(selectedFile)
             imageObj.tag = selectedFile
+
         }
     }
 
@@ -294,7 +294,7 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         }
     }
 
-    private fun uploadImageOnStorage(){
+    private fun uploadImageOnStorage(callback : UploadImageOnStorageCallback){
         val fileRef = storageRef.child("$email/$titleObj.png")
         val fileImageRef = storageRef.child("${imageObj.tag}/$email/$titleObj.png")
         fileImageRef.putFile(imageObj.tag!! as Uri)
@@ -304,6 +304,7 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                     .addOnSuccessListener { uri ->
                         downloadUrlImageObj = uri.toString()
                         Log.d("Firebase", "File loc: ${uri.path}")
+                        callback.receivedDownloadUrl(downloadUrlImageObj)
                     }
                     .addOnFailureListener {
                         Log.d("Firebase", "download failed")
@@ -314,15 +315,37 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             }
     }
 
+    private val requestPermissionCamera =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                Log.i("DEBUG", "permission granted")
+                openCamera()
+            } else {
+                !ActivityCompat.shouldShowRequestPermissionRationale(
+                    this, android.Manifest.permission.CAMERA)
+                Log.i("DEBUG", "permission denied")
+            }
+        }
+
+
     private val requestPermissionGallery =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
                 Log.i("DEBUG", "permission granted")
+                val intent = Intent()
+                    .setType("image/*")
+                    .setAction(Intent.ACTION_PICK)
+                resultIntentSelectFile.launch(Intent.createChooser(intent, "Select a file"))
             } else {
-                // if permission denied then check whether never ask
-                // again is selected or not by making use of
-                // !ActivityCompat.shouldShowRequestPermissionRationale(
-                // requireActivity(), Manifest.permission.CAMERA)
+                if (Build.VERSION.SDK_INT >= 33){
+                    Log.d("ciao", "ciao")
+                    !ActivityCompat.shouldShowRequestPermissionRationale(
+                        this, android.Manifest.permission.READ_MEDIA_IMAGES)
+                }
+                else {
+                    !ActivityCompat.shouldShowRequestPermissionRationale(
+                        this, android.Manifest.permission.READ_EXTERNAL_STORAGE)
+                }
                 Log.i("DEBUG", "permission denied")
             }
         }
@@ -337,46 +360,23 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         resultIntentShootPhoto.launch(cameraIntent)
     }
 
-    /*
-    private fun createBitmap(uri: Uri?) : Bitmap? {
-        var bitmap: Bitmap? = null
-        try {
-            bitmap = BitmapFactory.decodeStream(URL(uri.toString()).content as InputStream)
-            val newWidth = 170
-            val newHeight = 170
-            val width = bitmap.width
-            val height = bitmap.height
-
-            val scaleWidth = newWidth.toFloat() / width
-            val scaleHeight = newHeight.toFloat() / height
-
-            val matrix = Matrix()
-            matrix.postScale(scaleWidth, scaleHeight)
-
-            return Bitmap.createBitmap(bitmap,0,0,width, height, matrix, false)
-        }
-        catch (e: Exception) {
-            e.printStackTrace()
-            return null
-        }
-    }
-*/
-
-
-    private fun createHashMapObjAndUpload() {
-        val map = hashMapOf<String,Any?>(
+    private fun createHashMapObjAndUpload(downloadUrlImage: String) {
+        val venduto  = "false"
+        val map = hashMapOf<String, Any?>(
             "titolo" to titleObj,
             "categoria" to categoryObj,
             "indirizzo" to addressObj,
             "descrizione" to descriptionObj,
             "prezzo" to priceObj,
-            "condizione" to categoryObj,
-            "foto" to downloadUrlImageObj,
+            "condizione" to conditionObj,
+            "foto" to downloadUrlImage,
             "email" to emailObj,
             "telefono" to phoneObj,
-            "spedire" to expeditionObj
-
-
+            "spedire" to expeditionObj,
+            "venduto" to venduto,
+            "mailVendAuth" to email,
+            "latitudine" to latitude,
+            "logitudine" to longitude
         )
         db.collection("Oggetti").document(email)
             .collection("miei_oggetti").document(titleObj).set(map)
@@ -387,9 +387,41 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 Log.w(TAG, "Errore eggiunta oggetto: $e", e)
             }
 
+        /*val serviceIntent = Intent(requireContext(), ListenerForegroundChat::class.java)
+        serviceIntent.putExtra("emailSeller", emailObj )
+        serviceIntent.putExtra("titleObj", titleObj )
+        startForegroundService(requireContext(), serviceIntent)*/
     }
 
-    private fun downloadCategories(){
+    fun foregroundServiceRunning(): Boolean {
+        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?
+        @Suppress("DEPRECATION")
+        for (service in activityManager!!.getRunningServices(Int.MAX_VALUE)) {
+            if (ListenerForegroundChat::class.java.name == service.service.className) {
+                return true
+            }
+        }
+        return false
+    }
+
+    /*
+    companion object {
+
+        //lateinit var ETlocationObj: EditText
+        /**
+         * Use this factory method to create a new instance of
+         * this fragment using the provided parameters.
+         *
+         * @param param1 Parameter 1.
+         * @param param2 Parameter 2.
+         * @return A new instance of fragment FragmentNewAdvert.
+         */
+        // TODO: Rename and change types and number of parameters
+    }
+
+    */
+
+    private fun downloadCategories(callback: DownloadCategoryCallback){
         listCategories = arrayListOf()
         db.collection("Categorie").get()
             .addOnSuccessListener { categories ->
@@ -397,13 +429,16 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                     val categoria = category.id
                     listCategories.add(categoria)
                 }
+                callback.onDataLoaded(listCategories)
             }
             .addOnFailureListener{ err ->
                 Log.e(TAG, "Error downloading categories object : $err")
             }
+
     }
 
     private fun checkSwitchExpedition() {
+        expeditionObj = "false"
         switchExpeditionObj.setOnCheckedChangeListener { compoundButton:
                                                          CompoundButton, value: Boolean ->
             if (value) {
@@ -413,25 +448,59 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 compoundButton.text = getString(R.string.sendObj)
                 expeditionObj = "false"
             }
-
         }
     }
 
-    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        if (parent != null) {
-            if (parent.id == R.id.spinnerCat){
-                categoryObj = parent.getItemAtPosition(position).toString()
-                spinnercategoryObj.prompt = listCategories[position]
+    public fun retrieveLocationAsync(context : Context, coordinates : LatLng) : String{
+        val geocoder = Geocoder(context)
+        lateinit var indirizzo : String
+        val geocodeMatches =
+            geocoder.getFromLocation(coordinates.latitude, coordinates.longitude, 1) as List<Address>
+        indirizzo = geocodeMatches[0].getAddressLine(0)
+        return indirizzo
+    }
+
+    internal class WorkerLocationClass(appContext: Context, workerParams: WorkerParameters): Worker(appContext, workerParams) {
+
+        var context : Context
+        init {
+            context = appContext
+        }
+
+        override fun doWork(): Result {
+            val latitude = inputData.keyValueMap["latitude"]
+            val longitude = inputData.keyValueMap["longitude"]
+            val coordinates = LatLng(latitude as Double, longitude as Double)
+            Log.d("WorkerClass","It's Working")
+            ETlocationObj.setEditableText(FragmentNewAdvert().retrieveLocationAsync(context, coordinates as LatLng))
+            return Result.success()
+        }
+    }
+
+    override fun onDataLoaded(data: ArrayList<String>) {
+        val adapterCategory = ArrayAdapter(this, android.R.layout.simple_spinner_item, data)
+        adapterCategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnercategoryObj.adapter = adapterCategory
+        spinnercategoryObj.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, v: View, position: Int, id: Long) {
+                categoryObj = listCategories[position]
             }
-            if (parent.id == R.id.spinCondition){
-                conditionObj = parent.getItemAtPosition(position).toString()
+            override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
+    }
+
+    override fun receivedDownloadUrl(downloadUrl : String){
+        createHashMapObjAndUpload(downloadUrl)
+    }
+
+    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        TODO("Not yet implemented")
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
         TODO("Not yet implemented")
     }
 
-
 }
+

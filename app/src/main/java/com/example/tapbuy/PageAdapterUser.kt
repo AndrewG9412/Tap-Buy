@@ -23,7 +23,7 @@ class PageAdapterUser (private val fm: FragmentManager, private val lifecycle : 
                 FragmentNewAdvert()
             }
             else -> {
-                FragmentSearch()
+                FragmentMyObject()
             }
         }
     }

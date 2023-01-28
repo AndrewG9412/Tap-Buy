@@ -1,5 +1,7 @@
 package com.example.tapbuy
 
+import android.app.ActivityManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -8,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat.startForegroundService
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
@@ -67,9 +70,6 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener, D
         val linearLayout = LinearLayoutManager(context)
         recyclerViewMyObject = view.findViewById(R.id.recycleViewObject)
         recyclerViewMyObject.layoutManager = linearLayout
-        //adapterRecycle = AdapterRecycleMyObject(context, listMyObject)
-        //recyclerViewMyObject.adapter = adapterRecycle
-        //adapterRecycle.setClickListener(this)
         downloadListMyObject(db, email, this)
     }
 
@@ -106,11 +106,21 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener, D
                     val address = document.data.getValue("indirizzo").toString()
                     val description = document.data.getValue("descrizione").toString()
                     val condition = document.data.getValue("condizione").toString()
-                    val email = document.data.getValue("email").toString()
+                    val emailAdvert = document.data.getValue("email").toString()
                     val phone = document.data.getValue("telefono").toString()
                     val expedition = document.data.getValue("spedire").toString()
                     val selled = document.data.getValue("venduto").toString()
-                    obj = MyObject(photo,title,price,category,address,description,condition,email,phone,expedition, selled)
+                    val mailVendAuth = document.data.getValue("mailVendAuth").toString()
+                    obj = MyObject(photo,title,price,category,address,description,condition,emailAdvert,phone,expedition, selled, mailVendAuth)
+                    if (!foregroundServiceRunning()) {
+                        val serviceIntent = Intent(
+                            requireContext(),
+                            ListenerForegroundChat::class.java
+                        )
+                        serviceIntent.putExtra("emailSeller", mailVendAuth )
+                        serviceIntent.putExtra("titleObj", title)
+                        startForegroundService(requireContext(),serviceIntent)
+                    }
                     listMyObject.add(obj)
                 }
                 callback.oneDataDownloaded(listMyObject)
@@ -120,6 +130,17 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener, D
 
             }
 
+    }
+
+    fun foregroundServiceRunning(): Boolean {
+        val activityManager = requireContext().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?
+        @Suppress("DEPRECATION")
+        for (service in activityManager!!.getRunningServices(Int.MAX_VALUE)) {
+            if (ListenerForegroundChat::class.java.name == service.service.className) {
+                return true
+            }
+        }
+        return false
     }
 
     override fun onItemClick(view: View?, position: Int) {

@@ -31,10 +31,9 @@ class ListenerForegroundChat() : Service() {
         Thread {
             while (true) {
                 Log.e("Service", "Service is running...")
-                Log.e("Service", "${mailSeller}_${nameObj}")
                 try {
-                    db.collection("Chat").document("${mailSeller}_${nameObj}")
-                        .collection("chat").addSnapshotListener { snapshots, e ->
+                    db.collection("Chat").document(mailSeller)
+                        .collection("oggetti").addSnapshotListener { snapshots, e ->
                         if (e != null) {
                             Log.d(TAG, "Cannot listen on firestore!!.")
                             return@addSnapshotListener
@@ -46,7 +45,7 @@ class ListenerForegroundChat() : Service() {
                                     //Log.d("quoteListener", "New quote: ${dc.document.data}")
                                     createNotification("Chat", dc.document.id)
                                 }
-                                DocumentChange.Type.MODIFIED -> {}
+                                DocumentChange.Type.MODIFIED -> {createNotification("Chat", dc.document.id)}
                                 DocumentChange.Type.REMOVED -> {}
                             }
                         }
@@ -74,14 +73,14 @@ class ListenerForegroundChat() : Service() {
         return super.onStartCommand(intent, flags, startId)
     }
 
-    private fun createNotification(channelId: String, idDoc : String) {
+    private fun createNotification(channelId: String, titleObj : String) {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val importance = NotificationManager.IMPORTANCE_LOW
         val channel = NotificationChannel(channelId, channelId, importance)
         notificationManager.createNotificationChannel(channel)
 
         val resultIntent = Intent(this, ChatUsers::class.java )
-        resultIntent.putExtra("buyer_id_document", idDoc )
+        resultIntent.putExtra("",titleObj )
 
         val pendingIntent = PendingIntent.getActivity(
             this,
