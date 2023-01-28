@@ -42,14 +42,14 @@ class AdapterRecycleMyObject(context: Context?, private val mList:List<MyObject>
 
         // sets the image to the imageview from our itemHolder class
 
-        Picasso.get().load(itemsViewModel.photo).into(holder.imageObject)
+        Picasso.get().load(itemsViewModel.photo).resize(90, 90).centerCrop().into(holder.imageObject)
 
         // sets the text to the textview from our itemHolder class
-        //holder.textTitle.text = itemsViewModel.
+        holder.textTitle.text = itemsViewModel.title
 
-       // holder.textPrice.text = itemsViewModel.
+        holder.textPrice.text = "€ ${itemsViewModel.price}"
 
-
+        if (itemsViewModel.selled == "true") holder.textSelled.visibility = View.VISIBLE
     }
     override fun getItemCount(): Int {
         return mList.size
@@ -60,9 +60,10 @@ class AdapterRecycleMyObject(context: Context?, private val mList:List<MyObject>
     // Holds the views for adding it to image and text
     inner class ViewHolder internal constructor(itemView: View) : RecyclerView.ViewHolder(itemView),
         View.OnClickListener {
-        val imageObject : ImageView = itemView.findViewById(R.id.image_object)
+        val imageObject : ImageView = itemView.findViewById(R.id.imageObj)
         val textTitle : TextView = itemView.findViewById(R.id.titleObj)
         val textPrice : TextView = itemView.findViewById(R.id.priceObj)
+        val textSelled : TextView = itemView.findViewById(R.id.textSelled)
 
         override fun onClick(view: View?) {
             if (mClickListener != null) {

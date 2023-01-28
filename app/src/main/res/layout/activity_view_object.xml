@@ -34,7 +34,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="36dp"
         android:text="categoria"
         app:layout_constraintStart_toEndOf="@+id/image"
         app:layout_constraintTop_toBottomOf="@+id/tvObjName" />
@@ -44,7 +44,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="27dp"
+        android:layout_marginTop="40dp"
         android:text="price"
         app:layout_constraintStart_toEndOf="@+id/image"
         app:layout_constraintTop_toBottomOf="@+id/tvCategory" />
@@ -65,7 +65,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="108dp"
         android:text="address"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvDescription" />
@@ -80,26 +80,25 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvCondition" />
 
+
     <TextView
         android:id="@+id/tvEmail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="48dp"
         android:text="mail"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvAddress" />
-
 
     <TextView
         android:id="@+id/tvExpedition"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="20dp"
         android:text="spedisce"
-        app:layout_constraintStart_toEndOf="@+id/image"
-        app:layout_constraintTop_toBottomOf="@+id/tvPrice" />
+        app:layout_constraintStart_toEndOf="@+id/labelExpedition"
+        tools:layout_editor_absoluteY="403dp" />
 
     <TextView
         android:id="@+id/tvPhone"
@@ -116,9 +115,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="56dp"
-        android:layout_marginBottom="64dp"
-        android:text="@string/btn_modify"
+        android:layout_marginBottom="40dp"
         android:backgroundTint="@color/dark_green"
+        android:text="@string/btn_modify"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -127,8 +126,8 @@
         android:id="@+id/btn_delete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="56dp"
-        android:layout_marginBottom="64dp"
+        android:layout_marginEnd="64dp"
+        android:layout_marginBottom="40dp"
         android:backgroundTint="@color/dark_green"
         android:text="@string/btn_delete"
         android:visibility="invisible"
@@ -141,6 +140,28 @@
         android:layout_height="wrap_content"
         android:backgroundTint="@color/dark_green"
         android:text="@string/contact"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="486dp" />
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.451"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="557dp" />
+
+    <TextView
+        android:id="@+id/labelExpedition"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="12dp"
+        android:text="@string/labelExp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvAddress" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/selled"
+        android:backgroundTint="@color/dark_green"
+        tools:layout_editor_absoluteX="260dp"
+        tools:layout_editor_absoluteY="466dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>

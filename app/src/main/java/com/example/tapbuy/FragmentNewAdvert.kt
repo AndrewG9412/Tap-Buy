@@ -156,7 +156,6 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
 
             override fun onItemSelected(parent: AdapterView<*>, v: View, position: Int, id: Long) {
                 conditionObj = parent.getItemAtPosition(position).toString()
-                Log.d("spinner","$conditionObj")
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -408,6 +407,7 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
     }*/
 
     private fun createHashMapObjAndUpload(downloadUrlImage: String) {
+        val venduto  = "false"
         val map = hashMapOf<String, Any?>(
             "titolo" to titleObj,
             "categoria" to categoryObj,
@@ -418,7 +418,8 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
             "foto" to downloadUrlImage,
             "email" to emailObj,
             "telefono" to phoneObj,
-            "spedire" to expeditionObj
+            "spedire" to expeditionObj,
+            "venduto" to venduto
         )
         db.collection("Oggetti").document(email)
             .collection("miei_oggetti").document(titleObj).set(map)
@@ -477,7 +478,6 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
                 for (category in categories){
                     val categoria = category.id
                     listCategories.add(categoria)
-                    Log.d("spinner","$listCategories")
                 }
                 callback.onDataLoaded(listCategories)
             }
@@ -528,20 +528,14 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
     }
 
     override fun onDataLoaded(data: ArrayList<String>) {
-        Log.d("ciao","ciao")
         val adapterCategory = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, data)
         adapterCategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        //adapterCategory.notifyDataSetChanged()
-        Log.d("data","$data")
         spinnercategoryObj.adapter = adapterCategory
         spinnercategoryObj.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-
             override fun onItemSelected(parent: AdapterView<*>, v: View, position: Int, id: Long) {
                 categoryObj = listCategories[position]
-                Log.d("spinner","$categoryObj")
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                Log.d("ciao","ciao")
             }
         }
     }

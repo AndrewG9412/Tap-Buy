@@ -47,6 +47,18 @@
             android:textSize="22sp"
              />
 
+        <TextView
+            android:id="@+id/textSelled"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/selled"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            android:textColor="@color/red"
+            android:textSize="20sp"
+            android:visibility="gone"
+            android:layout_margin="20dp"/>
+
 
     </RelativeLayout>
 

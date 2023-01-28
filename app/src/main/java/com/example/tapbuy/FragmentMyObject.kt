@@ -41,7 +41,7 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener, D
 
     private lateinit var recyclerViewMyObject : RecyclerView
     private lateinit var adapterRecycle : AdapterRecycleMyObject
-    private var listMyObject : ArrayList<MyObject> = ArrayList()
+    private lateinit var listMyObject : ArrayList<MyObject>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,10 +67,10 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener, D
         val linearLayout = LinearLayoutManager(context)
         recyclerViewMyObject = view.findViewById(R.id.recycleViewObject)
         recyclerViewMyObject.layoutManager = linearLayout
-        adapterRecycle = AdapterRecycleMyObject(context, listMyObject)
-        recyclerViewMyObject.adapter = adapterRecycle
-        adapterRecycle.setClickListener(this)
-        //downloadListMyObject(db, email, this)
+        //adapterRecycle = AdapterRecycleMyObject(context, listMyObject)
+        //recyclerViewMyObject.adapter = adapterRecycle
+        //adapterRecycle.setClickListener(this)
+        downloadListMyObject(db, email, this)
     }
 
     companion object {
@@ -95,25 +95,23 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener, D
 
      private fun downloadListMyObject(db : FirebaseFirestore, email : String, callback: DownloadDataCallback){
         listMyObject = arrayListOf()
+        lateinit var obj : MyObject
         db.collection("Oggetti").document(email).collection("miei_oggetti")
             .get().addOnSuccessListener {result ->
                 for (document in result){
-                    lateinit var obj : MyObject
-                    document.data.forEach{
-                        when (it.key){
-                            "titolo" -> obj.title = it.value as String
-                            "categoria" -> obj.category = it.value as String
-                            "indirizzo" -> obj.address = it.value as String
-                            "descrizione" -> obj.description = it.value as String
-                            "prezzo" -> obj.price = it.value as String
-                            "condizione" -> obj.condition = it.value as String
-                            "foto" -> obj.photo = it.value as String
-                            "email" -> obj.email = it.value as String
-                            "telefono" -> obj.phone = it.value as String
-                            "spedire" -> obj.expedition = it.value as String
-                        }
-                    }
-                listMyObject.add(obj)
+                    val title =  document.data.getValue("titolo").toString()
+                    val price =  document.data.getValue("prezzo").toString()
+                    val photo =  document.data.getValue("foto").toString()
+                    val category = document.data.getValue("categoria").toString()
+                    val address = document.data.getValue("indirizzo").toString()
+                    val description = document.data.getValue("descrizione").toString()
+                    val condition = document.data.getValue("condizione").toString()
+                    val email = document.data.getValue("email").toString()
+                    val phone = document.data.getValue("telefono").toString()
+                    val expedition = document.data.getValue("spedire").toString()
+                    val selled = document.data.getValue("venduto").toString()
+                    obj = MyObject(photo,title,price,category,address,description,condition,email,phone,expedition, selled)
+                    listMyObject.add(obj)
                 }
                 callback.oneDataDownloaded(listMyObject)
             }
@@ -132,9 +130,9 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener, D
     }
 
     override fun oneDataDownloaded(data: ArrayList<MyObject>) {
+
         adapterRecycle = AdapterRecycleMyObject(context, data)
         recyclerViewMyObject.adapter = adapterRecycle
-
         adapterRecycle.setClickListener(this)
 
     }

@@ -52,6 +52,8 @@
     <string name="btn_research">Ricerca</string>
     <string name="received_message">Hai ricevuto un messaggio !</string>
     <string name="message_for">"Messaggio relativo all'oggetto : "</string>
+    <string name="labelExp">Spedisce :</string>
+    <string name="selled">Venduto</string>
 
     <string-array name="object_condition">
         <item>Nuovo</item>

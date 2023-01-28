@@ -337,7 +337,7 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         resultIntentShootPhoto.launch(cameraIntent)
     }
 
-
+    /*
     private fun createBitmap(uri: Uri?) : Bitmap? {
         var bitmap: Bitmap? = null
         try {
@@ -360,7 +360,7 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             return null
         }
     }
-
+*/
 
 
     private fun createHashMapObjAndUpload() {
