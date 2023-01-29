@@ -1,7 +1,9 @@
 package com.example.tapbuy
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -11,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -25,12 +28,19 @@ class ChatUsers : AppCompatActivity() {
     private lateinit var db: FirebaseFirestore
     private lateinit var email : String
 
-    private lateinit var imageObj : ImageView
-    private lateinit var titleObj : TextView
-    private lateinit var emailObj : TextView
+    private lateinit var tvTitleObj : TextView
+    private lateinit var tvEmailObj : TextView
+
+    private lateinit var tvUserSays : TextView
+    private lateinit var tvReceivedMessage : TextView
 
     private lateinit var sendMessage : EditText
     private lateinit var sendButton : Button
+    private lateinit var closeChat : Button
+
+    private lateinit var nomeObj : String
+    private lateinit var emailObj : String
+    private lateinit var uidCompr : String
 
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
@@ -41,36 +51,94 @@ class ChatUsers : AppCompatActivity() {
         email = auth.currentUser?.email.toString()
 
         extras = intent.extras!!
-        extras.getString("nomeObj")
-        //intent.getString("emailObj")
-        //intent.getString("imageObj", )
+        nomeObj = extras.getString("nomeObj").toString()
+        emailObj = extras.getString("emailObj").toString()
+        uidCompr = extras.getString("uidCompr").toString()
 
-        titleObj = findViewById(R.id.nameObj)
-        emailObj = findViewById(R.id.nameProp)
+        tvTitleObj = findViewById(R.id.nameObj)
+        tvEmailObj = findViewById(R.id.mailObj)
+        tvUserSays = findViewById(R.id.userSays)
+        tvReceivedMessage = findViewById(R.id.receivedMessage)
         sendMessage = findViewById(R.id.comment)
         sendButton = findViewById(R.id.btn_send)
+        closeChat = findViewById(R.id.closeChat)
+
+        tvTitleObj.text = nomeObj
+        tvEmailObj.text = emailObj
+
+        if (uidCompr != auth.currentUser?.uid.toString()){
+            //venditore
+            db.collection("Chat").document("${emailObj}_${nomeObj}")
+                .collection("chat").document(uidCompr).collection("message").addSnapshotListener{ snapshots, e ->
+                    if (e != null) {
+                        return@addSnapshotListener
+                    }
+                    for (dc in snapshots!!.documentChanges) {
+                        when (dc.type) {
+                            DocumentChange.Type.ADDED -> {
+                                tvUserSays.text = String.format(resources.getString(R.string.userSays), dc.document.data["user"].toString())
+                                tvReceivedMessage.text = dc.document.data["message"].toString()
+                            }
+                            DocumentChange.Type.MODIFIED -> {
+                                tvUserSays.text = String.format(resources.getString(R.string.userSays), dc.document.data["user"].toString())
+                                tvReceivedMessage.text = dc.document.data["message"].toString()
+                            }
+                            DocumentChange.Type.REMOVED -> {
+                            }
+                        }
+                    }
+
+                }
+
+        }
+
     }
 
     private fun createMess(){
-
         val messaggio = hashMapOf<String, Any?>(
             "user" to auth.currentUser?.email.toString(),
             "message" to sendMessage.text.toString(),
-
         )
-
-     //   db.collection("Chat").document(mailCompratore)
-     //       .collection(oggettoInteressato).document().set(messaggio)
-    }
-
-    private fun downloadMessages(){
-     //   db.collection("Chat").document(mailcompratore).collection(ogg)
+        db.collection("Chat").document("${emailObj}_${nomeObj}")
+            .collection("chat").document(uidCompr).collection("message").document("messaggio").set(messaggio)
     }
 
     override fun onResume() {
         super.onResume()
 
+        sendButton.setOnClickListener{
+            if (uidCompr == auth.currentUser?.uid.toString()){
+                db.collection("Chat").document("${emailObj}_${nomeObj}")
+                    .collection("chat").document(uidCompr).collection("message").addSnapshotListener{snapshots, e ->
+                        if (e != null) {
+                            return@addSnapshotListener
+                        }
+                        for (dc in snapshots!!.documentChanges) {
+                            when (dc.type) {
+                                DocumentChange.Type.ADDED -> {
+                                    tvUserSays.text = String.format(resources.getString(R.string.userSays), dc.document.data["user"].toString())
+                                    tvReceivedMessage.text = dc.document.data["message"].toString()
+                                }
+                                DocumentChange.Type.MODIFIED -> {
+                                    tvUserSays.text = String.format(resources.getString(R.string.userSays), dc.document.data["user"].toString())
+                                    tvReceivedMessage.text = dc.document.data["message"].toString()
+                                }
+                                DocumentChange.Type.REMOVED -> {
+                                }
+                            }
+                        }
+
+                    }
+                createMess()
+            }
+            else {
+                createMess()
+            }
+        }
+
+        closeChat.setOnClickListener{
+            startActivity(Intent(this, FragmentMyObject::class.java))
+        }
+
     }
 }
-
-data class messageChat(val user : String, val message : String, val date : String)

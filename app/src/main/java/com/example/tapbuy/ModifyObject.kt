@@ -397,6 +397,7 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener, Do
             "latitudine" to latitude,
             "logitudine" to longitude
         )
+        val obj = MyObject(downloadUrlImage,titleObj,priceObj,categoryObj,addressObj,descriptionObj,conditionObj,emailObj,phoneObj,expeditionObj, selled, email)
         db.collection("Oggetti").document(email)
             .collection("miei_oggetti").document(titleObj).set(map)
             .addOnSuccessListener { documentReference ->
@@ -405,6 +406,10 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener, Do
             .addOnFailureListener { e ->
                 Log.w(TAG, "Errore eggiunta oggetto: $e", e)
             }
+
+        val intent = Intent(this, ViewObject::class.java)
+        intent.putExtra("obj", obj)
+        startActivity(intent)
 
         /*val serviceIntent = Intent(requireContext(), ListenerForegroundChat::class.java)
         serviceIntent.putExtra("emailSeller", emailObj )

@@ -406,18 +406,15 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
                 Log.w(TAG, "Errore eggiunta oggetto: $e", e)
             }
 
-        val mapChat = hashMapOf<String, Any?>(
-            "mail" to email,
-            "message" to "")
 
-        db.collection("Chat").document(auth.currentUser?.email.toString()).collection("oggetti").document(
-            titleObj
-        )
-            .collection("chat").document(auth.currentUser?.uid.toString()).set(mapChat)
-        val serviceIntent = Intent(requireContext(), ListenerForegroundChat::class.java)
-        serviceIntent.putExtra("emailSeller", emailObj )
-        serviceIntent.putExtra("titleObj", titleObj )
-        startForegroundService(requireContext(), serviceIntent)
+        //db.collection("Chat").document(auth.currentUser?.email.toString()).collection("oggetti").document(
+         //   titleObj).collection("chat").document(auth.currentUser?.uid.toString()).set(mapChat)
+       // val serviceIntent = Intent(requireContext(), ListenerForegroundChat::class.java)
+      //  serviceIntent.putExtra("emailSeller", emailObj )
+        //serviceIntent.putExtra("titleObj", titleObj )
+        //startForegroundService(requireContext(), serviceIntent)
+
+        startActivity(Intent(requireContext(), MyObject::class.java))
     }
     companion object {
 

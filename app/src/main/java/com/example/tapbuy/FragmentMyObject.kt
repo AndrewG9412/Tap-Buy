@@ -1,6 +1,6 @@
 package com.example.tapbuy
 
-import android.app.ActivityManager
+import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -10,11 +10,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.content.ContextCompat.startForegroundService
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
@@ -112,7 +114,7 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener, D
                     val selled = document.data.getValue("venduto").toString()
                     val mailVendAuth = document.data.getValue("mailVendAuth").toString()
                     obj = MyObject(photo,title,price,category,address,description,condition,emailAdvert,phone,expedition, selled, mailVendAuth)
-                    if (!foregroundServiceRunning()) {
+                    /*if (!foregroundServiceRunning()) {
                         val serviceIntent = Intent(
                             requireContext(),
                             ListenerForegroundChat::class.java
@@ -120,18 +122,74 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener, D
                         serviceIntent.putExtra("emailSeller", mailVendAuth )
                         serviceIntent.putExtra("titleObj", title)
                         startForegroundService(requireContext(),serviceIntent)
+                    }*/
+                    db.collection("Chat").document("${emailAdvert}_${title}").collection("chat").addSnapshotListener{
+                            snapshots, e ->
+                        if (e != null) {
+                            Log.d(TAG, "Cannot listen on firestore!!.")
+                            return@addSnapshotListener
+                        }
+
+                        for (dc in snapshots!!.documentChanges) {
+                            when (dc.type) {
+                                DocumentChange.Type.ADDED -> {
+                                    //Log.d("quoteListener", "New quote: ${dc.document.data}")
+                                    createNotification("Chat", dc.document.id,title)
+                                }
+                                DocumentChange.Type.MODIFIED -> {createNotification("Chat", dc.document.id,title)}
+                                DocumentChange.Type.REMOVED -> {}
+                            }
+                        }
                     }
                     listMyObject.add(obj)
                 }
+                /*val CHANNELID = "In ascolto dei messaggi dai possibili compratori"
+                val channel = NotificationChannel(CHANNELID, CHANNELID, NotificationManager.IMPORTANCE_LOW)
+                requireContext().getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
+                val notification: Notification.Builder = Notification.Builder(requireContext(), CHANNELID)
+                    .setContentText("Service is running")
+                    .setContentTitle("Service enabled")
+                startForeground(1001, notification.build())
+
+                 */
+
+
                 callback.oneDataDownloaded(listMyObject)
             }
             .addOnFailureListener { err ->
                 Log.e(TAG, "Error retrieving Object from Firestore: $err")
-
             }
-
     }
 
+    private fun createNotification(channelId: String, uid : String, nameObj : String) {
+        val notificationManager =
+            requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val importance = NotificationManager.IMPORTANCE_LOW
+        val channel = NotificationChannel(channelId, channelId, importance)
+        notificationManager.createNotificationChannel(channel)
+
+        val resultIntent = Intent(requireContext(), ChatUsers::class.java)
+        resultIntent.putExtra("uidCompr", uid)
+
+        val pendingIntent = PendingIntent.getActivity(
+            requireContext(),
+            0,
+            resultIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        val notification = Notification.Builder(requireContext(),
+            channelId)
+            .setContentTitle(getString(R.string.received_message))
+            .setContentText("${getString(R.string.message_for)} ${nameObj}")
+            .setChannelId(channelId)
+            .setContentIntent(pendingIntent)
+            .build()
+
+        notificationManager.notify(1000, notification)
+    }
+
+
+    /*
     fun foregroundServiceRunning(): Boolean {
         val activityManager = requireContext().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?
         @Suppress("DEPRECATION")
@@ -142,7 +200,7 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener, D
         }
         return false
     }
-
+     */
     override fun onItemClick(view: View?, position: Int) {
         val clickedObj = listMyObject[position]
         val intent = Intent(context, ViewObject::class.java)

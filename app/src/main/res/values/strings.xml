@@ -64,6 +64,10 @@
         <item>Difettoso</item>
     </string-array>
 
+    <string name="userSays">%s dice : </string>
+    <string name="closeChat">Chiudi chat</string>
+    <string name="saveResearch">Salva ricerca</string>
+
     <string-array name="Price_choose">
         <item>Prezzo massimo:</item>
         <item>Prezzo minimo:</item>

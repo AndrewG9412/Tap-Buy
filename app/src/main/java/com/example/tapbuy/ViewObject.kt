@@ -101,7 +101,7 @@ class ViewObject : AppCompatActivity() {
             val intent = Intent(this, ChatUsers::class.java)
             intent.putExtra("nomeObj", intentObject.title )
             intent.putExtra("emailObj", intentObject.email)
-            intent.putExtra("emailCompr", auth.currentUser?.uid.toString())
+            intent.putExtra("uidCompr", auth.currentUser?.uid.toString())
             startActivity(intent)
         }
 
