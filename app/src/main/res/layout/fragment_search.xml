@@ -21,10 +21,10 @@
             android:textSize="23sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.405"
+            app:layout_constraintHorizontal_bias="0.459"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.048" />
+            app:layout_constraintVertical_bias="0.047" />
 
         <TextView
             android:id="@+id/tvNameObj"
@@ -69,7 +69,7 @@
             app:layout_constraintTop_toBottomOf="@+id/tvNameObj" />
 
         <EditText
-            android:id="@+id/Distance"
+            android:id="@+id/etDistance"
             android:layout_width="150dp"
             android:layout_height="48dp"
             android:layout_marginTop="16dp"
@@ -95,10 +95,10 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.298"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/Distance" />
+            app:layout_constraintTop_toBottomOf="@+id/etDistance" />
 
         <EditText
-            android:id="@+id/Price"
+            android:id="@+id/etPrice"
             android:layout_width="150dp"
             android:layout_height="48dp"
             android:layout_marginTop="12dp"
@@ -110,18 +110,18 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.924"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/Distance"
+            app:layout_constraintTop_toBottomOf="@+id/etDistance"
             tools:ignore="SpeakableTextPresentCheck" />
 
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/sendObj"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="68dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="24dp"
             android:text="@string/sendObj"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/Price" />
+            app:layout_constraintStart_toEndOf="@+id/cbExpedition"
+            app:layout_constraintTop_toBottomOf="@+id/etPrice" />
 
         <Button
             android:id="@+id/buttonResearch"
@@ -135,55 +135,59 @@
             app:layout_constraintTop_toBottomOf="@+id/sendObj" />
 
         <CheckBox
-            android:id="@+id/checkBox"
+            android:id="@+id/cbName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:layout_marginBottom="4dp"
-            app:layout_constraintBottom_toTopOf="@+id/checkBox2"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintBottom_toTopOf="@+id/cbDistance"
             app:layout_constraintEnd_toStartOf="@+id/tvNameObj" />
 
         <CheckBox
-            android:id="@+id/checkBox2"
+            android:id="@+id/cbDistance"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="12dp"
-            app:layout_constraintBottom_toTopOf="@+id/checkBox3"
+            app:layout_constraintBottom_toTopOf="@+id/cbPrice"
             app:layout_constraintEnd_toStartOf="@+id/Localization" />
 
         <CheckBox
-            android:id="@+id/checkBox3"
+            android:id="@+id/cbPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="24dp"
-            app:layout_constraintBottom_toTopOf="@+id/checkBox4"
+            app:layout_constraintBottom_toTopOf="@+id/cbExpedition"
             app:layout_constraintEnd_toStartOf="@+id/spinPrice" />
 
         <CheckBox
-            android:id="@+id/checkBox4"
+            android:id="@+id/cbExpedition"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
-            app:layout_constraintEnd_toStartOf="@+id/sendObj"
-            tools:layout_editor_absoluteY="271dp" />
+            android:layout_marginStart="16dp"
+            android:layout_marginBottom="24dp"
+            app:layout_constraintBottom_toTopOf="@+id/btn_save_research"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <Button
-            android:id="@+id/button"
+            android:id="@+id/btn_save_research"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
+            android:layout_marginEnd="28dp"
             android:backgroundTint="@color/dark_green"
             android:text="@string/saveResearch"
-            app:layout_constraintTop_toBottomOf="@+id/sendObj"
-            tools:layout_editor_absoluteX="64dp" />
+            app:layout_constraintEnd_toStartOf="@+id/buttonResearch"
+            app:layout_constraintTop_toBottomOf="@+id/sendObj" />
 
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycleSearch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:layout_editor_absoluteX="0dp"
-            tools:layout_editor_absoluteY="423dp" />
+            android:layout_marginTop="36dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_save_research" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
