@@ -8,7 +8,7 @@
 
 
     <ImageView
-        android:id="@+id/image"
+        android:id="@+id/imageObj"
         android:layout_width="170dp"
         android:layout_height="170dp"
         android:layout_margin="10dp"
@@ -28,7 +28,7 @@
         android:text="name"
         android:lines="3"
         android:textSize="25sp"
-        app:layout_constraintStart_toEndOf="@+id/image"
+        app:layout_constraintStart_toEndOf="@+id/imageObj"
         app:layout_constraintTop_toTopOf="parent" />
 
 
@@ -40,7 +40,7 @@
         android:layout_marginTop="16dp"
         android:text="categoria"
         android:textSize="25sp"
-        app:layout_constraintStart_toEndOf="@+id/image"
+        app:layout_constraintStart_toEndOf="@+id/imageObj"
         app:layout_constraintTop_toBottomOf="@+id/tvObjName" />
 
     <TextView
@@ -51,7 +51,7 @@
         android:layout_marginTop="28dp"
         android:text="price"
         android:textSize="25sp"
-        app:layout_constraintStart_toEndOf="@+id/image"
+        app:layout_constraintStart_toEndOf="@+id/imageObj"
         app:layout_constraintTop_toBottomOf="@+id/tvCategory" />
 
     <TextView
@@ -63,7 +63,7 @@
         android:text="condition"
         android:textSize="25sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/image" />
+        app:layout_constraintTop_toBottomOf="@+id/imageObj" />
 
     <TextView
         android:id="@+id/tvAddress"

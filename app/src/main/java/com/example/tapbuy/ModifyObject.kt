@@ -11,6 +11,7 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
+import android.graphics.drawable.Drawable
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
@@ -29,6 +30,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.work.*
 import com.example.tapbuy.FragmentNewAdvert.Companion.ETlocationObj
+import com.example.tapbuy.utils.Utils
 
 import com.example.tapbuy.utils.Utils.Companion.setEditableText
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -43,6 +45,7 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
+import com.squareup.picasso.Picasso
 import java.io.IOException
 import java.io.InputStream
 import java.net.URL
@@ -61,6 +64,7 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener, Do
 
     private lateinit var ETtitleObj : EditText
     private lateinit var imageObj : ImageView
+    private lateinit var imageFromStorage : Drawable
     private lateinit var spinnercategoryObj : Spinner
     private lateinit var ETpriceObj : EditText
     private lateinit var ETlocationObj: EditText
@@ -68,6 +72,7 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener, Do
     private lateinit var spinnerConditionObj : Spinner
     private lateinit var ETdescriptionObj : EditText
     private lateinit var switchExpeditionObj : SwitchCompat
+    private lateinit var switchSelled : SwitchCompat
     private lateinit var ETemailObj : EditText
     private lateinit var ETphoneObj : EditText
 
@@ -75,7 +80,7 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener, Do
     private lateinit var btn_gallery : ImageButton
     private lateinit var btn_photo : ImageButton
     private lateinit var btn_location : ImageButton
-    private lateinit var btn_create : Button
+    private lateinit var btn_modify : Button
 
     private lateinit var titleObj : String
     private lateinit var conditionObj : String
@@ -86,7 +91,10 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener, Do
     private lateinit var emailObj : String
     private lateinit var phoneObj : String
     private lateinit var addressObj : String
+    private lateinit var selled : String
     private lateinit var listCategories : ArrayList<String>
+
+    private lateinit var intentObject : MyObject
 
     private lateinit var latitude : String
     private lateinit var longitude : String
@@ -103,6 +111,7 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener, Do
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_modify_object)
 
         auth = Firebase.auth
         db = Firebase.firestore
@@ -110,20 +119,16 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener, Do
         storageRef = storage.reference
         email = auth.currentUser?.email.toString()
 
+        intentObject = Utils.getSerializable(this, "object", MyObject::class.java)
+
         spinnercategoryObj = findViewById(R.id.spinnerCat)
         downloadCategories(this)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-// qua per come è fatto non va bene, penso sia un attimo da rivedere come e quando richiamare il service
-        /*if (!foregroundServiceRunning()) {
-            val serviceIntent = Intent(
-                requireContext(),
-                ListenerForegroundChat::class.java
-            )
-            startForegroundService(requireContext(),serviceIntent)
-        }*/
         ETtitleObj = findViewById(R.id.edNameObj)
         imageObj = findViewById(R.id.image_object)
+        Picasso.get().load(intentObject.photo).resize(170, 170).centerCrop().into(imageObj)
+        imageFromStorage = imageObj.drawable
 
         ETpriceObj = findViewById(R.id.editPrice)
         spinnerConditionObj = findViewById(R.id.spinCondition)
@@ -141,6 +146,7 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener, Do
         }
         ETdescriptionObj = findViewById(R.id.etDescription)
         switchExpeditionObj = findViewById(R.id.sendObj)
+        switchSelled = findViewById(R.id.switchSelled)
         ETemailObj = findViewById(R.id.etEmail)
         ETphoneObj = findViewById(R.id.editTextPhone)
         ETlocationObj = findViewById(R.id.etAddress)
@@ -148,16 +154,27 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener, Do
         btn_gallery = findViewById(R.id.btn_gallery)
         btn_photo = findViewById(R.id.btn_photo)
         btn_location = findViewById(R.id.btn_location)
-        btn_create = findViewById(R.id.buttonCreate)
+        btn_modify = findViewById(R.id.buttonModify)
 
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        fillEditText(intentObject)
+    }
+
+    private fun fillEditText(obj : MyObject) : Unit{
+        ETtitleObj.setEditableText(obj.title)
+        ETpriceObj.setEditableText(obj.price)
+        ETdescriptionObj.setEditableText(obj.description)
+        ETemailObj.setEditableText(obj.email)
+        ETphoneObj.setEditableText(obj.phone)
+        ETlocationObj.setEditableText(obj.address)
     }
 
     override fun onResume() {
         super.onResume()
 
-
         checkSwitchExpedition()
+        checkSwitchSelled()
 
         btn_gallery.setOnClickListener {
             if (Build.VERSION.SDK_INT >= 33) {
@@ -171,9 +188,12 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener, Do
             requestPermissionCamera.launch(android.Manifest.permission.CAMERA)
         }
 
-        btn_create.setOnClickListener{
+        btn_modify.setOnClickListener{
             if(checkData()) {
-                uploadImageOnStorage(this)
+                if (imageFromStorage == imageObj.drawable){
+                    createHashMapObjAndUpload(intentObject.photo)
+                }
+                else uploadImageOnStorage(this)
             }
         }
 
@@ -361,7 +381,6 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener, Do
     }
 
     private fun createHashMapObjAndUpload(downloadUrlImage: String) {
-        val venduto  = "false"
         val map = hashMapOf<String, Any?>(
             "titolo" to titleObj,
             "categoria" to categoryObj,
@@ -373,7 +392,7 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener, Do
             "email" to emailObj,
             "telefono" to phoneObj,
             "spedire" to expeditionObj,
-            "venduto" to venduto,
+            "venduto" to selled,
             "mailVendAuth" to email,
             "latitudine" to latitude,
             "logitudine" to longitude
@@ -403,24 +422,6 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener, Do
         }
         return false
     }
-
-    /*
-    companion object {
-
-        //lateinit var ETlocationObj: EditText
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment FragmentNewAdvert.
-         */
-        // TODO: Rename and change types and number of parameters
-    }
-
-    */
-
     private fun downloadCategories(callback: DownloadCategoryCallback){
         listCategories = arrayListOf()
         db.collection("Categorie").get()
@@ -451,7 +452,22 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener, Do
         }
     }
 
-    public fun retrieveLocationAsync(context : Context, coordinates : LatLng) : String{
+    private fun checkSwitchSelled() {
+        selled = "false"
+        switchSelled.setOnCheckedChangeListener { compoundButton:
+                                                         CompoundButton, value: Boolean ->
+            if (value) {
+                compoundButton.text = getString(R.string.selledYes)
+                selled = "true"
+            } else {
+                compoundButton.text = getString(R.string.selledNo)
+                selled = "false"
+            }
+        }
+    }
+
+    /*
+    fun retrieveLocationAsync(context : Context, coordinates : LatLng) : String{
         val geocoder = Geocoder(context)
         lateinit var indirizzo : String
         val geocodeMatches =
@@ -459,7 +475,7 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener, Do
         indirizzo = geocodeMatches[0].getAddressLine(0)
         return indirizzo
     }
-
+    */
     internal class WorkerLocationClass(appContext: Context, workerParams: WorkerParameters): Worker(appContext, workerParams) {
 
         var context : Context

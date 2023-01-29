@@ -7,13 +7,16 @@ import android.os.Bundle
 import android.os.PersistableBundle
 import android.view.View
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.example.tapbuy.utils.Utils
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.squareup.picasso.Picasso
 import java.io.Serializable
 
 class ViewObject : AppCompatActivity() {
@@ -22,8 +25,6 @@ class ViewObject : AppCompatActivity() {
 
     private lateinit var auth : FirebaseAuth
     private lateinit var db: FirebaseFirestore
-
-    lateinit var extras : Bundle
 
     private lateinit var tvName : TextView
     private lateinit var tvCategory : TextView
@@ -35,6 +36,7 @@ class ViewObject : AppCompatActivity() {
     private lateinit var tvmail : TextView
     private lateinit var tvPhone : TextView
     private lateinit var tvSelled : TextView
+    private lateinit var imageObject : ImageView
 
     lateinit var btnContact : Button
     lateinit var btn_modify : Button
@@ -48,8 +50,8 @@ class ViewObject : AppCompatActivity() {
         auth = Firebase.auth
         db = Firebase.firestore
 
-        extras = intent.extras!!
-        intentObject = getSerializable(this, "object", MyObject::class.java)
+        //extras = intent.extras!!
+        intentObject = Utils.getSerializable(this, "object", MyObject::class.java)
 
         tvName = findViewById(R.id.tvObjName)
         tvCategory = findViewById(R.id.tvCategory)
@@ -61,6 +63,7 @@ class ViewObject : AppCompatActivity() {
         tvmail = findViewById(R.id.tvEmail)
         tvPhone = findViewById(R.id.tvPhone)
         tvSelled = findViewById(R.id.tvSelled)
+        imageObject = findViewById(R.id.imageObj)
 
         btnContact = findViewById(R.id.btn_contact)
         btn_modify = findViewById(R.id.btn_modify)
@@ -75,6 +78,7 @@ class ViewObject : AppCompatActivity() {
         tvAddress.text = intentObject.address
         tvmail.text = intentObject.email
         tvPhone.text = intentObject.phone
+        Picasso.get().load(intentObject.photo).resize(170, 170).centerCrop().into(imageObject)
 
         if (intentObject.selled == "true") {
             tvSelled.visibility = View.VISIBLE
@@ -114,19 +118,5 @@ class ViewObject : AppCompatActivity() {
             startActivity(intent)
         }
     }
-
-    private fun checkUserForEnablingButtonSeller(){
-
-    }
-
-
-    private fun <T : Serializable?> getSerializable(activity: Activity, name: String, clazz: Class<T>): T
-    {
-        return if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-            activity.intent.getSerializableExtra(name, clazz)!!
-        else
-            activity.intent.getSerializableExtra(name) as T
-    }
-
 
 }
