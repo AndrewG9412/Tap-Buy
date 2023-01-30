@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/activity_view_object_layout"
     android:background="@color/grey">
+
 
 
     <ImageView
@@ -72,8 +76,9 @@
         android:layout_marginStart="16dp"
         android:text="address"
         android:textSize="25sp"
+        app:layout_constraintBottom_toTopOf="@+id/tvExpedition"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="495dp" />
+        app:layout_constraintTop_toBottomOf="@+id/tvDescription" />
 
 
     <TextView
@@ -95,29 +100,23 @@
         android:layout_marginStart="16dp"
         android:text="mail"
         android:textSize="25sp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="608dp" />
+        app:layout_constraintTop_toBottomOf="@+id/tvExpedition"
+        app:layout_constraintVertical_bias="0.123" />
 
-    <TextView
-        android:id="@+id/tvExpedition"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:text="spedisce"
-        android:textSize="25sp"
-        app:layout_constraintStart_toEndOf="@+id/labelExpedition"
-        tools:layout_editor_absoluteY="550dp" />
 
     <TextView
         android:id="@+id/tvPhone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="28dp"
         android:text="phone"
         android:textSize="25sp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvEmail" />
+        app:layout_constraintTop_toBottomOf="@+id/tvEmail"
+        app:layout_constraintVertical_bias="0.181" />
 
     <Button
         android:id="@+id/btn_modify"
@@ -147,7 +146,7 @@
         android:id="@+id/btn_contact"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="12dp"
         android:backgroundTint="@color/dark_green"
         android:text="@string/contact"
         android:visibility="invisible"
@@ -156,25 +155,29 @@
         app:layout_constraintTop_toBottomOf="@+id/tvSelled" />
 
     <TextView
-        android:id="@+id/labelExpedition"
+        android:id="@+id/tvExpedition"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:text="@string/labelExp"
         android:textSize="25sp"
+        app:layout_constraintBottom_toTopOf="@+id/btn_modify"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="550dp" />
+        app:layout_constraintTop_toBottomOf="@+id/tvDescription" />
 
     <TextView
         android:id="@+id/tvSelled"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="40dp"
+        android:layout_marginEnd="48dp"
         android:text="@string/selled"
         android:textColor="@color/red"
         android:textSize="30sp"
         android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:layout_editor_absoluteY="642dp" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.92" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

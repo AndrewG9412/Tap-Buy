@@ -111,7 +111,7 @@ class FragmentSearch : Fragment() {
 
     private fun saveResearch(){
         editor = sharedPref.edit()
-        editor.putStringSet()
+        //editor.putStringSet()
         editor.apply()
     }
 }

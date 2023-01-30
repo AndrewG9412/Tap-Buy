@@ -1,15 +1,19 @@
 package com.example.tapbuy
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.PersistableBundle
+import android.util.Log
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.tapbuy.utils.Utils
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -21,7 +25,6 @@ import java.io.Serializable
 
 class ViewObject : AppCompatActivity() {
 
-    lateinit var viewedObj : MyObject
 
     private lateinit var auth : FirebaseAuth
     private lateinit var db: FirebaseFirestore
@@ -38,20 +41,23 @@ class ViewObject : AppCompatActivity() {
     private lateinit var tvSelled : TextView
     private lateinit var imageObject : ImageView
 
-    lateinit var btnContact : Button
-    lateinit var btn_modify : Button
-    lateinit var btn_delete : Button
+    private lateinit var btnContact : Button
+    private lateinit var btn_modify : Button
+    private lateinit var btn_delete : Button
+    lateinit var layoutActivityViewObject: ConstraintLayout
 
     private lateinit var intentObject : MyObject
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Log.d("ciao", "ciao")
         setContentView(R.layout.activity_view_object)
+       /* layoutActivityViewObject = findViewById(R.id.activity_view_object_layout)*/
 
         auth = Firebase.auth
         db = Firebase.firestore
-
+        Log.d("ciao", "intentObject.mailVendAuth")
         //extras = intent.extras!!
-        intentObject = Utils.getSerializable(this, "object", MyObject::class.java)
+        Log.d("ciao", "auth.currentUser?.email.toString()")
 
         tvName = findViewById(R.id.tvObjName)
         tvCategory = findViewById(R.id.tvCategory)
@@ -65,10 +71,11 @@ class ViewObject : AppCompatActivity() {
         tvSelled = findViewById(R.id.tvSelled)
         imageObject = findViewById(R.id.imageObj)
 
-        btnContact = findViewById(R.id.btn_contact)
         btn_modify = findViewById(R.id.btn_modify)
         btn_delete = findViewById(R.id.btn_delete)
+        btnContact = findViewById(R.id.btn_contact)
 
+        intentObject = Utils.getSerializable(this, "object", MyObject::class.java)
         tvName.text = intentObject.title
         tvCategory.text = intentObject.category
         tvPrice.text = intentObject.price
@@ -80,7 +87,13 @@ class ViewObject : AppCompatActivity() {
         tvPhone.text = intentObject.phone
         Picasso.get().load(intentObject.photo).resize(170, 170).centerCrop().into(imageObject)
 
-        if (intentObject.selled == "true") {
+        /*layoutActivityViewObject.setOnClickListener {
+            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(it?.windowToken, 0)
+        }*/
+
+
+        /*if (intentObject.selled == "true") {
             tvSelled.visibility = View.VISIBLE
             btnContact.visibility = View.GONE
             btnContact.isClickable = false
@@ -89,14 +102,10 @@ class ViewObject : AppCompatActivity() {
             btnContact.visibility = View.VISIBLE
         }
         else {
+            Log.d("ciao", "sono qui dentro")
             btn_modify.visibility = View.VISIBLE
             btn_delete.visibility = View.VISIBLE
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-
         btnContact.setOnClickListener{
             val intent = Intent(this, ChatUsers::class.java)
             intent.putExtra("nomeObj", intentObject.title )
@@ -104,8 +113,34 @@ class ViewObject : AppCompatActivity() {
             intent.putExtra("uidCompr", auth.currentUser?.uid.toString())
             startActivity(intent)
         }
-
         btn_modify.setOnClickListener{
+            val intent = Intent(this, ModifyObject::class.java)
+            intent.putExtra("obj", intentObject)
+            startActivity(intent)
+        }
+        btn_delete.setOnClickListener{
+            db.collection("Oggetti").document(intentObject.mailVendAuth).collection("miei_oggetti").document(intentObject.title).delete()
+            db.collection("Chat").document("${intentObject.email}_${intentObject.title}").delete()
+            val intent = Intent(this, FragmentMyObject::class.java)
+            startActivity(intent)
+        }
+
+         */
+    }
+
+    public override fun onStart() {
+        super.onStart()
+
+
+    }
+
+        override fun onResume() {
+        super.onResume()
+        Log.d("ciao", "sono qui dentro")
+
+
+
+        /*btn_modify.setOnClickListener{
             val intent = Intent(this, ModifyObject::class.java)
             intent.putExtra("obj", intentObject)
             startActivity(intent)
@@ -117,6 +152,8 @@ class ViewObject : AppCompatActivity() {
             val intent = Intent(this, FragmentMyObject::class.java)
             startActivity(intent)
         }
+        */
+
     }
 
 }

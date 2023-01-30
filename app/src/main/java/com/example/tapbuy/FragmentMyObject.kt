@@ -203,7 +203,7 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener, D
      */
     override fun onItemClick(view: View?, position: Int) {
         val clickedObj = listMyObject[position]
-        val intent = Intent(context, ViewObject::class.java)
+        val intent = Intent(activity, ViewObject::class.java)
         intent.putExtra("object", clickedObj)
         startActivity(intent)
     }
