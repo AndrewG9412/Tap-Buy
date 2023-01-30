@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/activity_view_object_layout"
     android:background="@color/grey">
-
 
 
     <ImageView
@@ -30,6 +26,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp"
         android:text="name"
+        android:textColor="@color/black"
         android:lines="3"
         android:textSize="25sp"
         app:layout_constraintStart_toEndOf="@+id/imageObj"
@@ -43,6 +40,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:text="categoria"
+        android:textColor="@color/black"
         android:textSize="25sp"
         app:layout_constraintStart_toEndOf="@+id/imageObj"
         app:layout_constraintTop_toBottomOf="@+id/tvObjName" />
@@ -54,6 +52,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="28dp"
         android:text="price"
+        android:textColor="@color/black"
         android:textSize="25sp"
         app:layout_constraintStart_toEndOf="@+id/imageObj"
         app:layout_constraintTop_toBottomOf="@+id/tvCategory" />
@@ -65,6 +64,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="56dp"
         android:text="condition"
+        android:textColor="@color/black"
         android:textSize="25sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageObj" />
@@ -74,9 +74,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="6dp"
         android:text="address"
+        android:textColor="@color/black"
         android:textSize="25sp"
-        app:layout_constraintBottom_toTopOf="@+id/tvExpedition"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvDescription" />
 
@@ -88,7 +89,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="40dp"
         android:text="descrip"
-        android:lines="6"
+        android:textColor="@color/black"
         android:textSize="25sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvCondition" />
@@ -98,32 +99,43 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
         android:text="mail"
+        android:textColor="@color/black"
         android:textSize="25sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvExpedition"
-        app:layout_constraintVertical_bias="0.123" />
+        app:layout_constraintTop_toBottomOf="@+id/labelExpedition" />
 
+    <TextView
+        android:id="@+id/tvExpedition"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="25dp"
+        android:text="spedisce"
+        android:textColor="@color/black"
+        android:textSize="25sp"
+        app:layout_constraintBottom_toTopOf="@+id/tvEmail"
+        app:layout_constraintStart_toEndOf="@+id/labelExpedition" />
 
     <TextView
         android:id="@+id/tvPhone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:text="phone"
+        android:textColor="@color/black"
         android:textSize="25sp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvEmail"
-        app:layout_constraintVertical_bias="0.181" />
+        app:layout_constraintTop_toBottomOf="@+id/tvEmail" />
 
     <Button
         android:id="@+id/btn_modify"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="56dp"
-        android:layout_marginBottom="40dp"
+        android:layout_marginStart="80dp"
+        android:layout_marginBottom="72dp"
         android:backgroundTint="@color/dark_green"
         android:text="@string/btn_modify"
         android:visibility="invisible"
@@ -135,7 +147,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="64dp"
-        android:layout_marginBottom="40dp"
+        android:layout_marginBottom="72dp"
         android:backgroundTint="@color/dark_green"
         android:text="@string/btn_delete"
         android:visibility="invisible"
@@ -146,38 +158,36 @@
         android:id="@+id/btn_contact"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginBottom="36dp"
         android:backgroundTint="@color/dark_green"
         android:text="@string/contact"
         android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvSelled" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
-        android:id="@+id/tvExpedition"
+        android:id="@+id/labelExpedition"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
         android:text="@string/labelExp"
+        android:textColor="@color/black"
         android:textSize="25sp"
-        app:layout_constraintBottom_toTopOf="@+id/btn_modify"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvDescription" />
+        app:layout_constraintTop_toBottomOf="@+id/tvAddress" />
 
     <TextView
         android:id="@+id/tvSelled"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="48dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="40dp"
         android:text="@string/selled"
         android:textColor="@color/red"
         android:textSize="30sp"
         android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.92" />
-
+        app:layout_constraintTop_toBottomOf="@+id/tvPrice" />
 </androidx.constraintlayout.widget.ConstraintLayout>
-

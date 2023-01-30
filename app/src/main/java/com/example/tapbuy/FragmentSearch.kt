@@ -11,6 +11,7 @@ import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import androidx.appcompat.widget.SwitchCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 // TODO: Rename parameter arguments, choose names that match
@@ -23,7 +24,7 @@ private const val ARG_PARAM2 = "param2"
  * Use the [FragmentSearch.newInstance] factory method to
  * create an instance of this fragment.
  */
-class FragmentSearch : Fragment() {
+class FragmentSearch : Fragment(), AdapterRecycleSearch.ItemClickListener {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -45,6 +46,8 @@ class FragmentSearch : Fragment() {
     private lateinit var btnSavedResearch : Button
 
     private lateinit var recycleSearchedObj : RecyclerView
+    private lateinit var adapterRecycle : AdapterRecycleSearch
+    private lateinit var arraySearchedObject : ArrayList<MyObject>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,6 +56,7 @@ class FragmentSearch : Fragment() {
             param2 = it.getString(ARG_PARAM2)
         }
         sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
+        arraySearchedObject = ArrayList()
     }
 
     override fun onCreateView(
@@ -98,7 +102,11 @@ class FragmentSearch : Fragment() {
 
         btnResearch = view.findViewById(R.id.buttonResearch)
         btnSavedResearch = view.findViewById(R.id.btn_save_research)
+
+        val linearLayout = LinearLayoutManager(context)
         recycleSearchedObj = view.findViewById(R.id.recycleSearch)
+        recycleSearchedObj.layoutManager = linearLayout
+        //adapterRecycle.setClickListener(this)
     }
 
     override fun onResume() {
@@ -113,5 +121,15 @@ class FragmentSearch : Fragment() {
         editor = sharedPref.edit()
         //editor.putStringSet()
         editor.apply()
+    }
+
+    private fun searchObjects(){
+        adapterRecycle = AdapterRecycleSearch(context, arraySearchedObject)
+        recycleSearchedObj.adapter = adapterRecycle
+    }
+
+    override fun onItemClick(view: View?, position: Int) {
+
+
     }
 }
