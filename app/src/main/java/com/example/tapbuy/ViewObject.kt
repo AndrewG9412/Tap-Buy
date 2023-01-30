@@ -115,7 +115,8 @@ class ViewObject : AppCompatActivity() {
         }
 
         btn_delete.setOnClickListener{
-            db.collection("Oggetti").document(intentObject.mailVendAuth).collection("miei_oggetti").document(intentObject.title).delete()
+            val ref = db.collection("Oggetti").document(intentObject.mailVendAuth).collection("miei_oggetti")
+            ref.document(intentObject.title).delete()
             db.collection("Chat").document("${intentObject.email}_${intentObject.title}").delete()
             val intent = Intent(this, LandingActivityUser::class.java)
             startActivity(intent)

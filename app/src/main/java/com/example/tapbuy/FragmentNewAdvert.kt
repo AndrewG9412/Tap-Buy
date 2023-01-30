@@ -403,7 +403,7 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
                 Log.d(TAG, "Oggetto aggiunto nel db")
             }
             .addOnFailureListener { e ->
-                Log.w(TAG, "Errore eggiunta oggetto: $e", e)
+                Log.w(TAG, "Errore aggiunta oggetto: $e", e)
             }
 
 
@@ -414,7 +414,7 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
         //serviceIntent.putExtra("titleObj", titleObj )
         //startForegroundService(requireContext(), serviceIntent)
 
-        startActivity(Intent(requireContext(), MyObject::class.java))
+        startActivity(Intent(requireContext(), LandingActivityUser::class.java))
     }
     companion object {
 
