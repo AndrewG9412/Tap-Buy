@@ -29,7 +29,6 @@ class ViewObject : AppCompatActivity() {
     private lateinit var tvName : TextView
     private lateinit var tvCategory : TextView
     private lateinit var tvPrice : TextView
-    private lateinit var tvExp : TextView
     private lateinit var tvCondition : TextView
     private lateinit var tvDescription : TextView
     private lateinit var tvAddress : TextView
@@ -37,26 +36,26 @@ class ViewObject : AppCompatActivity() {
     private lateinit var tvPhone : TextView
     private lateinit var tvSelled : TextView
     private lateinit var imageObject : ImageView
+    private lateinit var tvExpedition : TextView
 
     lateinit var btnContact : Button
     lateinit var btn_modify : Button
     lateinit var btn_delete : Button
 
     private lateinit var intentObject : MyObject
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_object)
 
         auth = Firebase.auth
         db = Firebase.firestore
 
         //extras = intent.extras!!
-        intentObject = Utils.getSerializable(this, "object", MyObject::class.java)
+        intentObject = Utils.getSerializable(this, "obj", MyObject::class.java)
 
         tvName = findViewById(R.id.tvObjName)
         tvCategory = findViewById(R.id.tvCategory)
         tvPrice = findViewById(R.id.tvPrice)
-        tvExp = findViewById(R.id.tvExpedition)
         tvCondition = findViewById(R.id.tvCondition)
         tvDescription = findViewById(R.id.tvDescription)
         tvAddress = findViewById(R.id.tvAddress)
@@ -64,6 +63,7 @@ class ViewObject : AppCompatActivity() {
         tvPhone = findViewById(R.id.tvPhone)
         tvSelled = findViewById(R.id.tvSelled)
         imageObject = findViewById(R.id.imageObj)
+        tvExpedition = findViewById(R.id.tvExpedition)
 
         btnContact = findViewById(R.id.btn_contact)
         btn_modify = findViewById(R.id.btn_modify)
@@ -71,13 +71,16 @@ class ViewObject : AppCompatActivity() {
 
         tvName.text = intentObject.title
         tvCategory.text = intentObject.category
-        tvPrice.text = intentObject.price
-        tvExp.text = intentObject.expedition
+        tvPrice.text = "€ ${intentObject.price}"
+        tvExpedition.text = intentObject.expedition
         tvCondition.text = intentObject.condition
         tvDescription.text = intentObject.description
         tvAddress.text = intentObject.address
         tvmail.text = intentObject.email
         tvPhone.text = intentObject.phone
+        if (intentObject.expedition == "true") tvExpedition.text = "si"
+        else tvExpedition.text = "no"
+        tvExpedition.text
         Picasso.get().load(intentObject.photo).resize(170, 170).centerCrop().into(imageObject)
 
         if (intentObject.selled == "true") {
@@ -114,7 +117,7 @@ class ViewObject : AppCompatActivity() {
         btn_delete.setOnClickListener{
             db.collection("Oggetti").document(intentObject.mailVendAuth).collection("miei_oggetti").document(intentObject.title).delete()
             db.collection("Chat").document("${intentObject.email}_${intentObject.title}").delete()
-            val intent = Intent(this, FragmentMyObject::class.java)
+            val intent = Intent(this, LandingActivityUser::class.java)
             startActivity(intent)
         }
     }

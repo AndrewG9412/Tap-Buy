@@ -119,7 +119,7 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener, Do
         storageRef = storage.reference
         email = auth.currentUser?.email.toString()
 
-        intentObject = Utils.getSerializable(this, "object", MyObject::class.java)
+        intentObject = Utils.getSerializable(this, "obj", MyObject::class.java)
 
         spinnercategoryObj = findViewById(R.id.spinnerCat)
         downloadCategories(this)

@@ -50,6 +50,12 @@
             android:screenOrientation="portrait"/>
         <activity android:name=".ViewObject"
         android:screenOrientation="portrait"/>
+        <activity android:name=".ChatUsers"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ModifyObject"
+            android:screenOrientation="portrait"/>
+
+
 
     </application>
 
