@@ -31,12 +31,11 @@ class LandingActivityAdmin : AppCompatActivity(){
         TabLayoutMediator(tabLayout, viewPager){
                 tab, position ->
             when (position){
-                0 -> tab.icon = AppCompatResources.getDrawable(this, R.drawable.home)
-                1 -> tab.icon = AppCompatResources.getDrawable(this, R.drawable.lente)
-                2 -> tab.text = getString(R.string.modify_cat)
+                0 -> tab.icon = AppCompatResources.getDrawable(this, R.drawable.lente)
+                1 -> tab.text = getString(R.string.modify_cat)
+
             }
         }.attach()
-
     }
 
 
