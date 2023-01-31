@@ -67,6 +67,8 @@
     <string name="userSays">%s dice : </string>
     <string name="closeChat">Chiudi chat</string>
     <string name="saveResearch">Salva ricerca</string>
+    <string name="addCategory">Aggiungi categoria</string>
+    <string name="modifyCat">Modifica</string>
 
     <string-array name="Price_choose">
         <item>Prezzo massimo:</item>
