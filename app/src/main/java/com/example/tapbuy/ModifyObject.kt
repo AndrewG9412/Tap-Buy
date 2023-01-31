@@ -8,9 +8,6 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Matrix
 import android.graphics.drawable.Drawable
 import android.location.Address
 import android.location.Geocoder
@@ -18,7 +15,6 @@ import android.location.Location
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
@@ -47,8 +43,6 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
 import com.squareup.picasso.Picasso
 import java.io.IOException
-import java.io.InputStream
-import java.net.URL
 
 class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener, DownloadCategoryCallback, UploadImageOnStorageCallback {
 
@@ -498,7 +492,7 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener, Do
         }
     }
 
-    override fun onDataLoaded(data: ArrayList<String>) {
+    override fun onDataLoaded(data: ArrayList<Category>) {
         val adapterCategory = ArrayAdapter(this, android.R.layout.simple_spinner_item, data)
         adapterCategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnercategoryObj.adapter = adapterCategory

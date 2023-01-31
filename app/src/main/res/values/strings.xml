@@ -69,6 +69,9 @@
     <string name="saveResearch">Salva ricerca</string>
     <string name="addCategory">Aggiungi categoria</string>
     <string name="modifyCat">Modifica</string>
+    <string name="listCat">Modifica categorie :</string>
+    <string name="newCat">Nuova categoria :</string>
+    <string name="new_name_cat">Nuovo nome categoria</string>
 
     <string-array name="Price_choose">
         <item>Prezzo massimo:</item>

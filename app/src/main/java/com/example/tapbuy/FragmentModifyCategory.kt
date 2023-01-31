@@ -1,12 +1,20 @@
 package com.example.tapbuy
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.EditText
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -18,16 +26,24 @@ private const val ARG_PARAM2 = "param2"
  * Use the [FragmentModifyCategory.newInstance] factory method to
  * create an instance of this fragment.
  */
-class FragmentModifyCategory : Fragment() {
+class FragmentModifyCategory : Fragment(), DownloadCategoryCallback, AdapterRecycleCategory.ItemClickListener {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
 
-    private lateinit var recycleViewSavedResearches : RecyclerView
-    private lateinit var adapterRecycle : AdapterRecycleSavedResearch
-    private lateinit var listMyObject : ArrayList<MySavedResearch>
+    private var TAG = "FragmentModifyCategory"
+
+    private lateinit var db: FirebaseFirestore
+
+    private lateinit var listCategories : ArrayList<Category>
+
+    private lateinit var recycleViewCategories : RecyclerView
+    private lateinit var adapterRecycle : AdapterRecycleCategory
+
 
     private lateinit var btnAddCategory : Button
+
+    private lateinit var etNewCat : EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +51,9 @@ class FragmentModifyCategory : Fragment() {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+
+        db = Firebase.firestore
+        downloadCategories(this)
     }
 
     override fun onCreateView(
@@ -43,6 +62,23 @@ class FragmentModifyCategory : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_modify_category, container, false)
+    }
+
+
+    private fun downloadCategories(callback: DownloadCategoryCallback){
+        listCategories = arrayListOf()
+        db.collection("Categorie").get()
+            .addOnSuccessListener { categories ->
+                for (category in categories){
+                    val categoria = Category(category.id)
+                    listCategories.add(categoria)
+                }
+                callback.onDataLoaded(listCategories)
+            }
+            .addOnFailureListener{ err ->
+                Log.e(TAG, "Error downloading categories object : $err")
+            }
+
     }
 
     companion object {
@@ -67,14 +103,35 @@ class FragmentModifyCategory : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        recycleViewSavedResearches = view.findViewById(R.id.rvCat)
+        recycleViewCategories = view.findViewById(R.id.rvCat)
         btnAddCategory = view.findViewById(R.id.btn_add_cat)
+        etNewCat = view.findViewById(R.id.etNewCat)
     }
 
     override fun onResume() {
         super.onResume()
-        btnAddCategory.setOnClickListener{
 
+        btnAddCategory.setOnClickListener{
+            val newCategory = etNewCat.text.toString()
+            val map = hashMapOf(
+                "nome" to newCategory
+            )
+            db.collection("Categorie").document(newCategory).set(map)
         }
     }
+
+    override fun onDataLoaded(data: ArrayList<Category>) {
+        val linearLayout = LinearLayoutManager(requireContext())
+        recycleViewCategories.layoutManager = linearLayout
+        adapterRecycle = AdapterRecycleCategory(context, data)
+        recycleViewCategories.adapter = adapterRecycle
+        adapterRecycle.setClickListener(this)
+    }
+
+    override fun onItemClick(view: View?, position: Int) {
+        val intent = Intent(requireContext(), ModifyCategoryActivity::class.java )
+        intent.putExtra("category_to_edit", listCategories[position].name.toString())
+        startActivity(intent)
+    }
 }
+data class Category(val name : String)

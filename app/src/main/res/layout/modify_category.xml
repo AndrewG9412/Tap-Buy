@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/grey">
+
+    <EditText
+        android:id="@+id/etModCat"
+        android:layout_width="250dp"
+        android:layout_height="40dp"
+        android:layout_centerInParent="true"
+        android:background="@color/white"
+        android:gravity="center"
+        android:hint="@string/new_name_cat"
+        android:textColorHint="@color/black"/>
+
+    <Button
+        android:id="@+id/btnModCat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/modifyCat"
+        android:layout_margin="20dp"
+        android:layout_below="@+id/etModCat"
+        android:layout_centerHorizontal="true"
+        android:backgroundTint="@color/dark_green"
+        />
+
+</RelativeLayout>

@@ -2,7 +2,6 @@ package com.example.tapbuy
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.ActivityManager
 import android.app.NotificationManager
 import android.content.ContentValues
 import android.content.Context
@@ -24,7 +23,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.startForegroundService
 import androidx.fragment.app.Fragment
 import androidx.work.*
 import com.example.tapbuy.utils.Utils.Companion.setEditableText
@@ -92,7 +90,7 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
     private lateinit var emailObj : String
     private lateinit var phoneObj : String
     private lateinit var addressObj : String
-    private lateinit var listCategories : ArrayList<String>
+    private lateinit var listCategories : ArrayList<Category>
 
     private lateinit var latitude : String
     private lateinit var longitude : String
@@ -443,7 +441,7 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
         db.collection("Categorie").get()
             .addOnSuccessListener { categories ->
                 for (category in categories){
-                    val categoria = category.id
+                    val categoria = Category(category.id)
                     listCategories.add(categoria)
                 }
                 callback.onDataLoaded(listCategories)
@@ -494,13 +492,13 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
         }
     }
 
-    override fun onDataLoaded(data: ArrayList<String>) {
+    override fun onDataLoaded(data: ArrayList<Category>) {
         val adapterCategory = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, data)
         adapterCategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnercategoryObj.adapter = adapterCategory
         spinnercategoryObj.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, v: View, position: Int, id: Long) {
-                categoryObj = listCategories[position]
+                categoryObj = listCategories[position].name.toString()
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
@@ -514,7 +512,7 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
 }
 
 interface DownloadCategoryCallback{
-    fun onDataLoaded(data : ArrayList<String>)
+    fun onDataLoaded(data: ArrayList<Category>)
 }
 
 interface UploadImageOnStorageCallback{

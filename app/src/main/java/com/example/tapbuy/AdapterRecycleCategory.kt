@@ -5,12 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.squareup.picasso.Picasso
 
-class AdapterRecycleSavedResearch(context: Context?, private val mList:List<MyObject>) : RecyclerView.Adapter<AdapterRecycleSavedResearch.ViewHolder>() {
+class AdapterRecycleCategory(context: Context?, private val mList:List<Category>) : RecyclerView.Adapter<AdapterRecycleCategory.ViewHolder>() {
 
     private val mInflater: LayoutInflater
     private var mClickListener: ItemClickListener? = null
@@ -38,7 +36,7 @@ class AdapterRecycleSavedResearch(context: Context?, private val mList:List<MyOb
         val itemsViewModel = mList[position]
 
         // sets the text to the textview from our itemHolder class
-        holder.textCategory.text = itemsViewModel.
+        holder.textCategory.text = itemsViewModel.name
 
     }
     override fun getItemCount(): Int {
@@ -50,8 +48,7 @@ class AdapterRecycleSavedResearch(context: Context?, private val mList:List<MyOb
     // Holds the views for adding it to image and text
     inner class ViewHolder internal constructor(itemView: View) : RecyclerView.ViewHolder(itemView),
         View.OnClickListener {
-        val textCategory : TextView = itemView.findViewById(R.id.titleObj)
-        val btnModify : Button = itemView.findViewById(R.id.textSelled)
+        val textCategory : TextView = itemView.findViewById(R.id.tvCat)
 
         override fun onClick(view: View?) {
             if (mClickListener != null) {
@@ -65,7 +62,7 @@ class AdapterRecycleSavedResearch(context: Context?, private val mList:List<MyOb
     }
 
     // convenience method for getting data at click position
-    fun getItem(id: Int): MyObject {
+    fun getItem(id: Int): Category {
         return mList[id]
     }
 
