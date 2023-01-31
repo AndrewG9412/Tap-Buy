@@ -35,7 +35,7 @@ class FragmentModifyCategory : Fragment(), DownloadCategoryCallback, AdapterRecy
 
     private lateinit var db: FirebaseFirestore
 
-    private lateinit var listCategories : ArrayList<Category>
+    private lateinit var listCategories : ArrayList<String>
 
     private lateinit var recycleViewCategories : RecyclerView
     private lateinit var adapterRecycle : AdapterRecycleCategory
@@ -51,26 +51,53 @@ class FragmentModifyCategory : Fragment(), DownloadCategoryCallback, AdapterRecy
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
-
+        Log.d("ciao","sono qui" )
         db = Firebase.firestore
-        downloadCategories(this)
+
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        Log.d("ciao","sono qui" )
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_modify_category, container, false)
+
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val linearLayout = LinearLayoutManager(context)
+        recycleViewCategories = view.findViewById(R.id.rvCat)
+        recycleViewCategories.layoutManager = linearLayout
+        downloadCategories(this)
+        Log.d("ciao","sono qui" )
+        btnAddCategory = view.findViewById(R.id.btn_add_cat)
+        etNewCat = view.findViewById(R.id.etNewCat)
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        btnAddCategory.setOnClickListener{
+            val newCategory = etNewCat.text.toString()
+            val map = hashMapOf(
+                "nome" to newCategory
+            )
+            db.collection("Categorie").document(newCategory).set(map)
+            val intent = Intent(requireContext(), LandingActivityAdmin::class.java )
+            startActivity(intent)
+        }
+
+    }
 
     private fun downloadCategories(callback: DownloadCategoryCallback){
         listCategories = arrayListOf()
         db.collection("Categorie").get()
             .addOnSuccessListener { categories ->
                 for (category in categories){
-                    val categoria = Category(category.id)
+                    val categoria = category.id
                     listCategories.add(categoria)
                 }
                 callback.onDataLoaded(listCategories)
@@ -101,28 +128,7 @@ class FragmentModifyCategory : Fragment(), DownloadCategoryCallback, AdapterRecy
             }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        recycleViewCategories = view.findViewById(R.id.rvCat)
-        btnAddCategory = view.findViewById(R.id.btn_add_cat)
-        etNewCat = view.findViewById(R.id.etNewCat)
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        btnAddCategory.setOnClickListener{
-            val newCategory = etNewCat.text.toString()
-            val map = hashMapOf(
-                "nome" to newCategory
-            )
-            db.collection("Categorie").document(newCategory).set(map)
-        }
-    }
-
-    override fun onDataLoaded(data: ArrayList<Category>) {
-        val linearLayout = LinearLayoutManager(requireContext())
-        recycleViewCategories.layoutManager = linearLayout
+    override fun onDataLoaded(data: ArrayList<String>) {
         adapterRecycle = AdapterRecycleCategory(context, data)
         recycleViewCategories.adapter = adapterRecycle
         adapterRecycle.setClickListener(this)
@@ -130,8 +136,8 @@ class FragmentModifyCategory : Fragment(), DownloadCategoryCallback, AdapterRecy
 
     override fun onItemClick(view: View?, position: Int) {
         val intent = Intent(requireContext(), ModifyCategoryActivity::class.java )
-        intent.putExtra("category_to_edit", listCategories[position].name.toString())
+        intent.putExtra("category_to_edit", listCategories[position])
         startActivity(intent)
     }
 }
-data class Category(val name : String)
+//data class Category(val name : String)

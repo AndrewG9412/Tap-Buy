@@ -492,7 +492,7 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener, Do
         }
     }
 
-    override fun onDataLoaded(data: ArrayList<Category>) {
+    override fun onDataLoaded(data: ArrayList<String>) {
         val adapterCategory = ArrayAdapter(this, android.R.layout.simple_spinner_item, data)
         adapterCategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnercategoryObj.adapter = adapterCategory

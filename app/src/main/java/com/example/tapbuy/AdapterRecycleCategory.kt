@@ -8,7 +8,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class AdapterRecycleCategory(context: Context?, private val mList:List<Category>) : RecyclerView.Adapter<AdapterRecycleCategory.ViewHolder>() {
+class AdapterRecycleCategory(context: Context?, private val mList:List<String>) : RecyclerView.Adapter<AdapterRecycleCategory.ViewHolder>() {
 
     private val mInflater: LayoutInflater
     private var mClickListener: ItemClickListener? = null
@@ -36,7 +36,7 @@ class AdapterRecycleCategory(context: Context?, private val mList:List<Category>
         val itemsViewModel = mList[position]
 
         // sets the text to the textview from our itemHolder class
-        holder.textCategory.text = itemsViewModel.name
+        holder.textCategory.text = itemsViewModel
 
     }
     override fun getItemCount(): Int {
@@ -62,7 +62,7 @@ class AdapterRecycleCategory(context: Context?, private val mList:List<Category>
     }
 
     // convenience method for getting data at click position
-    fun getItem(id: Int): Category {
+    fun getItem(id: Int): String {
         return mList[id]
     }
 

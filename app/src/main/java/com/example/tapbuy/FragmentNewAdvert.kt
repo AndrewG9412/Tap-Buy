@@ -90,7 +90,7 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
     private lateinit var emailObj : String
     private lateinit var phoneObj : String
     private lateinit var addressObj : String
-    private lateinit var listCategories : ArrayList<Category>
+    private lateinit var listCategories : ArrayList<String>
 
     private lateinit var latitude : String
     private lateinit var longitude : String
@@ -441,7 +441,7 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
         db.collection("Categorie").get()
             .addOnSuccessListener { categories ->
                 for (category in categories){
-                    val categoria = Category(category.id)
+                    val categoria = category.id
                     listCategories.add(categoria)
                 }
                 callback.onDataLoaded(listCategories)
@@ -492,13 +492,13 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
         }
     }
 
-    override fun onDataLoaded(data: ArrayList<Category>) {
+    override fun onDataLoaded(data: ArrayList<String>) {
         val adapterCategory = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, data)
         adapterCategory.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnercategoryObj.adapter = adapterCategory
         spinnercategoryObj.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, v: View, position: Int, id: Long) {
-                categoryObj = listCategories[position].name.toString()
+                categoryObj = listCategories[position]
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
@@ -512,7 +512,7 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
 }
 
 interface DownloadCategoryCallback{
-    fun onDataLoaded(data: ArrayList<Category>)
+    fun onDataLoaded(data: ArrayList<String>)
 }
 
 interface UploadImageOnStorageCallback{

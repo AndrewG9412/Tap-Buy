@@ -25,7 +25,7 @@ class LandingActivityAdmin : AppCompatActivity(){
         auth = Firebase.auth
 
         val viewPager = findViewById<ViewPager2>(R.id.viewPager)
-        viewPager.adapter = PageAdapterUser(supportFragmentManager, lifecycle)
+        viewPager.adapter = PageAdapterAdmin(supportFragmentManager, lifecycle)
 
         val tabLayout = findViewById<TabLayout>(R.id.tabLayout)
         TabLayoutMediator(tabLayout, viewPager){

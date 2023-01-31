@@ -1,5 +1,6 @@
 package com.example.tapbuy
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -45,6 +46,8 @@ class ModifyCategoryActivity : AppCompatActivity() {
            val map = hashMapOf("nome" to newName)
 
            db.collection("Categorie").document(newName).set(map)
+           val intent = Intent(this, LandingActivityAdmin::class.java )
+           startActivity(intent)
         }
     }
 

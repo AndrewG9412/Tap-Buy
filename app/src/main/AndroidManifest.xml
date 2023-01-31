@@ -54,6 +54,9 @@
             android:screenOrientation="portrait"/>
         <activity android:name=".ModifyObject"
             android:screenOrientation="portrait"/>
+        <activity android:name="ModifyCategoryActivity"
+            android:screenOrientation="portrait"/>
+
 
 
 
