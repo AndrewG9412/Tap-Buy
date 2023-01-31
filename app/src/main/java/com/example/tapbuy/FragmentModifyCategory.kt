@@ -5,6 +5,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import androidx.recyclerview.widget.RecyclerView
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -20,6 +22,12 @@ class FragmentModifyCategory : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+
+    private lateinit var recycleViewSavedResearches : RecyclerView
+    private lateinit var adapterRecycle : AdapterRecycleSavedResearch
+    private lateinit var listMyObject : ArrayList<MySavedResearch>
+
+    private lateinit var btnAddCategory : Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,5 +63,18 @@ class FragmentModifyCategory : Fragment() {
                     putString(ARG_PARAM2, param2)
                 }
             }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        recycleViewSavedResearches = view.findViewById(R.id.rvCat)
+        btnAddCategory = view.findViewById(R.id.btn_add_cat)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        btnAddCategory.setOnClickListener{
+
+        }
     }
 }

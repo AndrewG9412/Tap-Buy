@@ -15,20 +15,12 @@
             android:id="@+id/tvCat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="20sp"
+            android:layout_centerInParent="true"
+            android:textSize="30sp"
             android:textColor="@color/black"
             android:layout_marginTop="40dp"
             android:layout_marginStart="40dp"
             />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/modifyCat"
-            android:layout_marginTop="30dp"
-            android:backgroundTint="@color/dark_green"
-            android:layout_marginStart="40dp"
-            android:layout_toEndOf="@id/tvCat"/>
 
 
     </RelativeLayout>
