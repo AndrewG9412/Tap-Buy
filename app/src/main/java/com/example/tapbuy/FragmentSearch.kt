@@ -1,6 +1,7 @@
 package com.example.tapbuy
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -106,13 +107,24 @@ class FragmentSearch : Fragment(), AdapterRecycleSearch.ItemClickListener {
         val linearLayout = LinearLayoutManager(context)
         recycleSearchedObj = view.findViewById(R.id.recycleSearch)
         recycleSearchedObj.layoutManager = linearLayout
-        //adapterRecycle.setClickListener(this)
+
+    }
+
+    private fun retrieveChangedFields(){
+
+
     }
 
     override fun onResume() {
         super.onResume()
 
+        btnResearch.setOnClickListener{
 
+        }
+
+        btnSavedResearch.setOnClickListener{
+            saveResearch()
+        }
 
     }
 
@@ -126,10 +138,12 @@ class FragmentSearch : Fragment(), AdapterRecycleSearch.ItemClickListener {
     private fun searchObjects(){
         adapterRecycle = AdapterRecycleSearch(context, arraySearchedObject)
         recycleSearchedObj.adapter = adapterRecycle
+        adapterRecycle.setClickListener(this)
     }
 
     override fun onItemClick(view: View?, position: Int) {
-
-
+        val intent = Intent(requireContext(), ViewObject::class.java)
+        intent.putExtra("obj", arraySearchedObject[position] )
+        startActivity(intent)
     }
 }
