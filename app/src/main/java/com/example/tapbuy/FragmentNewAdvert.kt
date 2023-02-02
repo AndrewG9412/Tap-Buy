@@ -75,7 +75,6 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
     private lateinit var ETemailObj : EditText
     private lateinit var ETphoneObj : EditText
 
-
     private lateinit var btn_gallery : ImageButton
     private lateinit var btn_photo : ImageButton
     private lateinit var btn_location : ImageButton
@@ -180,6 +179,7 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
             } else {
                 requestPermissionGallery.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE)
             }
+
         }
 
         btn_photo.setOnClickListener {

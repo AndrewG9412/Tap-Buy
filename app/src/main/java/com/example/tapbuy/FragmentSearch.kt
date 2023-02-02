@@ -1,18 +1,24 @@
 package com.example.tapbuy
 
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.CheckBox
+import android.widget.CompoundButton
 import android.widget.EditText
 import androidx.appcompat.widget.SwitchCompat
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -28,7 +34,7 @@ class FragmentSearch : Fragment(), AdapterRecycleSearch.ItemClickListener {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-
+    private lateinit var db: FirebaseFirestore
     private lateinit var sharedPref: SharedPreferences
     private lateinit var editor :SharedPreferences.Editor
 
@@ -41,10 +47,11 @@ class FragmentSearch : Fragment(), AdapterRecycleSearch.ItemClickListener {
     private lateinit var editDistance : EditText
     private lateinit var editPrice : EditText
     private lateinit var switchExpedition : SwitchCompat
+    private lateinit var expeditionObj : String
 
     private lateinit var btnResearch : Button
     private lateinit var btnSavedResearch : Button
-
+    private lateinit var listMail : ArrayList<String>
     private lateinit var recycleSearchedObj : RecyclerView
     private lateinit var adapterRecycle : AdapterRecycleSearch
     private lateinit var arraySearchedObject : ArrayList<MyObject>
@@ -55,6 +62,7 @@ class FragmentSearch : Fragment(), AdapterRecycleSearch.ItemClickListener {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+        db = Firebase.firestore
         sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
         arraySearchedObject = ArrayList()
     }
@@ -65,6 +73,7 @@ class FragmentSearch : Fragment(), AdapterRecycleSearch.ItemClickListener {
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_search, container, false)
+
     }
 
     companion object {
@@ -106,15 +115,39 @@ class FragmentSearch : Fragment(), AdapterRecycleSearch.ItemClickListener {
         val linearLayout = LinearLayoutManager(context)
         recycleSearchedObj = view.findViewById(R.id.recycleSearch)
         recycleSearchedObj.layoutManager = linearLayout
-        //adapterRecycle.setClickListener(this)
-    }
+
+        searchObjects()
+
+
+        }
+
 
     override fun onResume() {
         super.onResume()
+        listMail = arrayListOf()
+        db.collection("Oggetti").get()
+            .addOnSuccessListener { result ->
+                for (document in result){
+                    val mail = document.id
+                    listMail.add(mail)
+                    Log.d("mail", mail)
+                }
+
+            }
+            .addOnFailureListener{ err ->
+                Log.e(TAG, "Error downloading categories object : $err")
+            }
+
+
+        //val collezione = db.collection("Oggetti")
+        //Log.d("refDB", "$collezione")
 
 
 
     }
+
+
+
 
 
     private fun saveResearch(){
@@ -126,6 +159,7 @@ class FragmentSearch : Fragment(), AdapterRecycleSearch.ItemClickListener {
     private fun searchObjects(){
         adapterRecycle = AdapterRecycleSearch(context, arraySearchedObject)
         recycleSearchedObj.adapter = adapterRecycle
+        adapterRecycle.setClickListener(this)
     }
 
     override fun onItemClick(view: View?, position: Int) {
