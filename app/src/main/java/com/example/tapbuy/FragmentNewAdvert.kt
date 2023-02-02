@@ -395,8 +395,10 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
             "latitudine" to latitude,
             "logitudine" to longitude
         )
-        db.collection("Oggetti").document(email)
-            .collection("miei_oggetti").document(titleObj).set(map)
+        val emptyMap = HashMap<String, String>()
+        val ref = db.collection("Oggetti").document(email)
+        ref.set(emptyMap)
+        ref.collection("miei_oggetti").document(titleObj).set(map)
             .addOnSuccessListener { documentReference ->
                 Log.d(TAG, "Oggetto aggiunto nel db")
             }
