@@ -88,12 +88,12 @@ class ViewObject : AppCompatActivity() {
             btnContact.visibility = View.GONE
             btnContact.isClickable = false
         }
-        if (intentObject.mailVendAuth != auth.currentUser?.email.toString()){
-            btnContact.visibility = View.VISIBLE
-        }
-        else {
+        if ((intentObject.mailVendAuth == auth.currentUser?.email.toString()) || (auth.currentUser?.email.toString() == "amministratore@gmail.com")){
             btn_modify.visibility = View.VISIBLE
             btn_delete.visibility = View.VISIBLE
+        }
+        else {
+            btnContact.visibility = View.VISIBLE
         }
     }
 

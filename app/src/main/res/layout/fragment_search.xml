@@ -117,10 +117,11 @@
             android:id="@+id/sendObj"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
             android:layout_marginTop="24dp"
             android:text="@string/sendObj"
-            app:layout_constraintStart_toEndOf="@+id/cbExpedition"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.389"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/etPrice" />
 
         <Button
@@ -133,42 +134,6 @@
             android:text="@string/btn_research"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/sendObj" />
-
-        <CheckBox
-            android:id="@+id/cbName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            app:layout_constraintBottom_toTopOf="@+id/cbDistance"
-            app:layout_constraintEnd_toStartOf="@+id/tvNameObj" />
-
-        <CheckBox
-            android:id="@+id/cbDistance"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="12dp"
-            app:layout_constraintBottom_toTopOf="@+id/cbPrice"
-            app:layout_constraintEnd_toStartOf="@+id/Localization" />
-
-        <CheckBox
-            android:id="@+id/cbPrice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="24dp"
-            app:layout_constraintBottom_toTopOf="@+id/cbExpedition"
-            app:layout_constraintEnd_toStartOf="@+id/spinPrice" />
-
-        <CheckBox
-            android:id="@+id/cbExpedition"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginBottom="24dp"
-            app:layout_constraintBottom_toTopOf="@+id/btn_save_research"
-            app:layout_constraintStart_toStartOf="parent" />
 
         <Button
             android:id="@+id/btn_save_research"

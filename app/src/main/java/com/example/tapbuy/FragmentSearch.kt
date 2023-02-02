@@ -10,10 +10,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.CompoundButton
-import android.widget.EditText
+import android.widget.*
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -21,11 +18,13 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.gson.Gson
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -49,16 +48,12 @@ class FragmentSearch : Fragment(), AdapterRecycleSearch.ItemClickListener, Downl
     private lateinit var sharedPref: SharedPreferences
     private lateinit var editor :SharedPreferences.Editor
 
-    private lateinit var cbName : CheckBox
-    private lateinit var cbDistance : CheckBox
-    private lateinit var cbPrice : CheckBox
-    private lateinit var cbExpedition : CheckBox
 
     private lateinit var editName : EditText
     private lateinit var editDistance : EditText
     private lateinit var editPrice : EditText
     private lateinit var switchExpedition : SwitchCompat
-
+    private lateinit var priceTypeChoose : String
     private lateinit var btnResearch : Button
     private lateinit var btnSavedResearch : Button
 
@@ -67,15 +62,17 @@ class FragmentSearch : Fragment(), AdapterRecycleSearch.ItemClickListener, Downl
     private lateinit var arraySearchedObject : ArrayList<MyObject>
 
     private lateinit var valExpedition : String
+    private lateinit var spinnerChooseTypePrice : Spinner
 
     private lateinit var listMail : ArrayList<String>
+    private lateinit var numerirange : List<String>
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val LOCATION_REQUEST_CODE = 101
 
     private lateinit var coordinatesBuyer : LatLng
-
-    private lateinit var mySavedResearch: HashSet<MySavedResearch>
+    private lateinit var checkList : ArrayList<Boolean>
+    private lateinit var mySavedResearch: HashSet<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,6 +83,7 @@ class FragmentSearch : Fragment(), AdapterRecycleSearch.ItemClickListener, Downl
         sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
         arraySearchedObject = ArrayList()
         db = Firebase.firestore
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
         retrieveMail()
     }
 
@@ -120,10 +118,6 @@ class FragmentSearch : Fragment(), AdapterRecycleSearch.ItemClickListener, Downl
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        cbName = view.findViewById(R.id.cbName)
-        cbDistance = view.findViewById(R.id.cbDistance)
-        cbPrice = view.findViewById(R.id.cbPrice)
-        cbExpedition = view.findViewById(R.id.cbExpedition)
 
         editName = view.findViewById(R.id.edNameObj)
         editDistance = view.findViewById(R.id.etDistance)
@@ -132,6 +126,20 @@ class FragmentSearch : Fragment(), AdapterRecycleSearch.ItemClickListener, Downl
 
         btnResearch = view.findViewById(R.id.buttonResearch)
         btnSavedResearch = view.findViewById(R.id.btn_save_research)
+        spinnerChooseTypePrice = view.findViewById(R.id.spinPrice)
+        val adapterCondition = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, resources.getStringArray(R.array.Price_choose))
+        adapterCondition.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        priceTypeChoose = "Prezzo Massimo"
+        spinnerChooseTypePrice.adapter = adapterCondition
+        spinnerChooseTypePrice.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+
+            override fun onItemSelected(parent: AdapterView<*>, v: View, position: Int, id: Long) {
+                priceTypeChoose = parent.getItemAtPosition(position).toString()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
 
         val linearLayout = LinearLayoutManager(context)
         recycleSearchedObj = view.findViewById(R.id.recycleSearch)
@@ -141,9 +149,13 @@ class FragmentSearch : Fragment(), AdapterRecycleSearch.ItemClickListener, Downl
 
     override fun onResume() {
         super.onResume()
-
+        checkSwitchExpedition()
+        retrieveLocationBuyer()
         btnResearch.setOnClickListener{
-
+            arraySearchedObject.clear()
+            adapterRecycle = AdapterRecycleSearch(context, arraySearchedObject)
+            recycleSearchedObj.adapter = adapterRecycle
+            searchObjects(this)
         }
 
         btnSavedResearch.setOnClickListener{
@@ -169,7 +181,9 @@ class FragmentSearch : Fragment(), AdapterRecycleSearch.ItemClickListener, Downl
 
     private fun saveResearch(){
         editor = sharedPref.edit()
-        mySavedResearch.add()
+        val gson = Gson()
+        val json: String = gson.toJson(MySavedResearch(editName.text.toString(), editDistance.text.toString().toInt(), editPrice.text.toString(), valExpedition ))
+        mySavedResearch.add(json)
         //dentro sharedpref si devono mettere Set(hashSet ho usato)
         //prova a vedere se riesci a metterci dentro un hashSet (mySavedResearch) di oggetti MySavedResearch
         editor.putStringSet("mySavedResearch", mySavedResearch )
@@ -177,29 +191,110 @@ class FragmentSearch : Fragment(), AdapterRecycleSearch.ItemClickListener, Downl
     }
 
     private fun searchObjects(callback: DownloadResearchedObjectCallback){
+        var objecto : MyObject
+        numerirange = listOf()
+        numerirange = editPrice.text.toString().split("-")
         for (mail in listMail){
             db.collection("Oggetti").document(mail)
-                .collection("miei_oggetti").whereArrayContains("spedire", valExpedition).get()
+                .collection("miei_oggetti")/*.whereArrayContains("spedire", valExpedition)*/.get()
                 .addOnSuccessListener {
                     for (obj in it) {
-                        if (obj.get("titolo").toString().contains(editName.text.toString()))
-                        val coordinatesObj = LatLng(obj.get("latitude").toString().toDouble(), obj.get("longitude").toString().toDouble())
-                            if (haversine(coordinatesBuyer, coordinatesObj) <= (editDistance.text.toString().toDouble()))
-
-                                obj.get("prezzo"))
+                        checkList = arrayListOf()
+                        if(editName.text.isNotEmpty()) {
+                            if (obj.get("titolo").toString().contains(editName.text.toString())){
+                                checkList.add(true)
+                            }
+                            else {
+                                checkList.add(false)
+                            }
+                        }
+                        if(editDistance.text.isNotEmpty()) {
+                            val coordinatesObj = LatLng(
+                                obj.get("latitudine").toString().toDouble(),
+                                obj.get("longitudine").toString().toDouble()
+                            )
+                            if (haversine(coordinatesBuyer, coordinatesObj) <= (editDistance.text.toString().toDouble())) {
+                                checkList.add(true)
+                            }
+                            else {
+                                checkList.add(false)
+                            }
+                        }
+                        if(editPrice.text.isNotEmpty()) {
+                            Log.d("scelta prezzo",  priceTypeChoose)
+                            when (priceTypeChoose) {
+                                "Prezzo massimo:" -> if ((obj.get("prezzo").toString().toInt()) <= (editPrice.text.toString().toInt())){
+                                        checkList.add(true)
+                                    } else {
+                                        checkList.add(false)
+                                    }
+                                "Prezzo minimo:" -> if ((obj.get("prezzo").toString().toInt()) >= (editPrice.text.toString().toInt())){
+                                    checkList.add(true)
+                                }
+                                else {
+                                    checkList.add(false)
+                                }
+                                "Range di prezzo:" ->
+                                    if (((obj.get("prezzo").toString().toInt()) >= numerirange[0].toInt()) && ((obj.get("prezzo").toString().toInt()) <= numerirange[1].toInt()))  {
+                                        checkList.add(true)
+                                    }
+                                    else {
+                                        checkList.add(false)
+                                    }
+                                else -> { // Note the block
+                                    print("Non ho scelto nulla")
+                                }
+                            }
+                        }
+                        if(valExpedition.isNotEmpty()) {
+                            if ((obj.get("spedire").toString()) == valExpedition){
+                                checkList.add(true)
+                            }
+                            else {
+                                checkList.add(false)
+                            }
+                        }
+                        var risultato = true
+                        for (bool in checkList){
+                            if(!bool) risultato = false
+                        }
+                        if(risultato) {
+                            val title = obj.data.getValue("titolo").toString()
+                            val price = obj.data.getValue("prezzo").toString()
+                            val photo = obj.data.getValue("foto").toString()
+                            val category = obj.data.getValue("categoria").toString()
+                            val address = obj.data.getValue("indirizzo").toString()
+                            val description = obj.data.getValue("descrizione").toString()
+                            val condition = obj.data.getValue("condizione").toString()
+                            val emailAdvert = obj.data.getValue("email").toString()
+                            val phone = obj.data.getValue("telefono").toString()
+                            val expedition = obj.data.getValue("spedire").toString()
+                            val selled = obj.data.getValue("venduto").toString()
+                            val mailVendAuth = obj.data.getValue("mailVendAuth").toString()
+                            objecto = MyObject(
+                                photo,
+                                title,
+                                price,
+                                category,
+                                address,
+                                description,
+                                condition,
+                                emailAdvert,
+                                phone,
+                                expedition,
+                                selled,
+                                mailVendAuth
+                            )
+                            arraySearchedObject.add(objecto)
+                        }
                     }
-
-                arraySearchedObject.add()
-                }
         callback.onDataLoaded(arraySearchedObject)
         }
-
-
-
-        adapterRecycle = AdapterRecycleSearch(context, arraySearchedObject)
-        recycleSearchedObj.adapter = adapterRecycle
-        adapterRecycle.setClickListener(this)
+        .addOnFailureListener{ err ->
+            Log.e(TAG, "Error downloading categories object : $err")
+                }
     }
+}
 
 
     private fun haversine(p: LatLng, t: LatLng): Double {
@@ -215,7 +310,7 @@ class FragmentSearch : Fragment(), AdapterRecycleSearch.ItemClickListener, Downl
         return 6367 * c // 6367 is Earth radius in Km
     }
 
-    private fun retrieveLocationobj()  {
+    private fun retrieveLocationBuyer()  {
         val permission = ContextCompat.checkSelfPermission(
             requireContext(),
             android.Manifest.permission.ACCESS_FINE_LOCATION
@@ -271,11 +366,13 @@ class FragmentSearch : Fragment(), AdapterRecycleSearch.ItemClickListener, Downl
     }
 
     override fun onDataLoaded(data: ArrayList<MyObject>) {
-
+        adapterRecycle = AdapterRecycleSearch(context, data)
+        recycleSearchedObj.adapter = adapterRecycle
+        adapterRecycle.setClickListener(this)
     }
+
 }
 interface DownloadResearchedObjectCallback{
     fun onDataLoaded(data: ArrayList<MyObject>)
 }
 
-da

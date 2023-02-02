@@ -393,7 +393,7 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
             "venduto" to venduto,
             "mailVendAuth" to email,
             "latitudine" to latitude,
-            "logitudine" to longitude
+            "longitudine" to longitude
         )
         val emptyMap = HashMap<String, String>()
         val ref = db.collection("Oggetti").document(email)
