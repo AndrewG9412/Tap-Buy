@@ -134,6 +134,7 @@ class ChatUsers : AppCompatActivity() {
             else {
                 createMess()
             }
+            sendMessage.text.clear()
         }
 
         closeChat.setOnClickListener{
