@@ -201,7 +201,7 @@ class FragmentSearch : Fragment(), AdapterRecycleSearch.ItemClickListener, Downl
                     for (obj in it) {
                         checkList = arrayListOf()
                         if(editName.text.isNotEmpty()) {
-                            if (obj.get("titolo").toString().contains(editName.text.toString())){
+                            if (obj.get("titolo").toString().lowercase().contains(editName.text.toString().lowercase())){
                                 checkList.add(true)
                             }
                             else {

@@ -42,8 +42,8 @@ class ChatUsers : AppCompatActivity() {
     private lateinit var emailObj : String
     private lateinit var uidCompr : String
 
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
 
         auth = Firebase.auth
