@@ -1,5 +1,6 @@
 package com.example.tapbuy
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -184,8 +185,6 @@ class FragmentSearch : Fragment(), AdapterRecycleSearch.ItemClickListener, Downl
         val gson = Gson()
         val json: String = gson.toJson(MySavedResearch(editName.text.toString(), editDistance.text.toString().toInt(), editPrice.text.toString(), valExpedition ))
         mySavedResearch.add(json)
-        //dentro sharedpref si devono mettere Set(hashSet ho usato)
-        //prova a vedere se riesci a metterci dentro un hashSet (mySavedResearch) di oggetti MySavedResearch
         editor.putStringSet("mySavedResearch", mySavedResearch )
         editor.apply()
     }
@@ -200,8 +199,8 @@ class FragmentSearch : Fragment(), AdapterRecycleSearch.ItemClickListener, Downl
                 .addOnSuccessListener {
                     for (obj in it) {
                         checkList = arrayListOf()
-                        if(editName.text.isNotEmpty()) {
-                            if (obj.get("titolo").toString().contains(editName.text.toString())){
+                        if(editName.text.toString().isNotEmpty()) {
+                            if (obj.get("titolo").toString().lowercase().contains(editName.text.toString().lowercase())){
                                 checkList.add(true)
                             }
                             else {
@@ -313,7 +312,7 @@ class FragmentSearch : Fragment(), AdapterRecycleSearch.ItemClickListener, Downl
     private fun retrieveLocationBuyer()  {
         val permission = ContextCompat.checkSelfPermission(
             requireContext(),
-            android.Manifest.permission.ACCESS_FINE_LOCATION
+            Manifest.permission.ACCESS_FINE_LOCATION
         )
 
         if (permission == PackageManager.PERMISSION_GRANTED) {
@@ -331,7 +330,7 @@ class FragmentSearch : Fragment(), AdapterRecycleSearch.ItemClickListener, Downl
         }
         else {
             requestPermission(
-                android.Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION,
                 LOCATION_REQUEST_CODE
             )
         }
