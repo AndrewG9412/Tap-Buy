@@ -133,9 +133,9 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener, D
                         for (dc in snapshots!!.documentChanges) {
                             when (dc.type) {
                                 DocumentChange.Type.ADDED -> {
-                                    createNotification("Chat", dc.document.id,title)
+                                    createNotification("Chat", dc.document.id,title,emailAdvert)
                                 }
-                                DocumentChange.Type.MODIFIED -> {createNotification("Chat", dc.document.id,title)}
+                                DocumentChange.Type.MODIFIED -> {createNotification("Chat", dc.document.id,title,emailAdvert)}
                                 DocumentChange.Type.REMOVED -> {}
                             }
                         }
@@ -160,7 +160,7 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener, D
             }
     }
 
-    private fun createNotification(channelId: String, uid : String, nameObj : String) {
+    private fun createNotification(channelId: String, uid : String, nameObj : String, email : String) {
         val notificationManager =
             requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val importance = NotificationManager.IMPORTANCE_LOW
@@ -169,6 +169,9 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener, D
 
         val resultIntent = Intent(requireContext(), ChatUsers::class.java)
         resultIntent.putExtra("uidCompr", uid)
+        resultIntent.putExtra("nomeObj", nameObj)
+        resultIntent.putExtra("emailObj", email)
+
 
         val pendingIntent = PendingIntent.getActivity(
             requireContext(),
