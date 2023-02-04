@@ -67,7 +67,7 @@ class ChatUsers : AppCompatActivity() {
         tvEmailObj.text = emailObj
 
         if (uidCompr != auth.currentUser?.uid.toString()){
-            //venditore
+            Log.d("ciao", "sono qui")
             db.collection("Chat").document("${emailObj}_${nomeObj}")
                 .collection("chat").document(uidCompr).collection("message").addSnapshotListener{ snapshots, e ->
                     if (e != null) {
@@ -76,10 +76,11 @@ class ChatUsers : AppCompatActivity() {
                     for (dc in snapshots!!.documentChanges) {
                         when (dc.type) {
                             DocumentChange.Type.ADDED -> {
+                                //Log.d("ciao", "sono qui")
                                 tvUserSays.text = String.format(resources.getString(R.string.userSays), dc.document.data["user"].toString())
                                 tvReceivedMessage.text = dc.document.data["message"].toString()
                             }
-                            DocumentChange.Type.MODIFIED -> {
+                            DocumentChange.Type.MODIFIED -> {Log.d("ciao", "sono qui")
                                 tvUserSays.text = String.format(resources.getString(R.string.userSays), dc.document.data["user"].toString())
                                 tvReceivedMessage.text = dc.document.data["message"].toString()
                             }
@@ -138,7 +139,7 @@ class ChatUsers : AppCompatActivity() {
         }
 
         closeChat.setOnClickListener{
-            startActivity(Intent(this, FragmentMyObject::class.java))
+            startActivity(Intent(this, LandingActivityUser::class.java))
         }
 
     }
