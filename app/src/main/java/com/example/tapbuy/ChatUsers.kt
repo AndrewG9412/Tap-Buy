@@ -138,7 +138,7 @@ class ChatUsers : AppCompatActivity() {
         }
 
         closeChat.setOnClickListener{
-            startActivity(Intent(this, FragmentMyObject::class.java))
+            startActivity(Intent(this, LandingActivityUser::class.java))
         }
 
     }
