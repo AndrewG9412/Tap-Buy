@@ -123,6 +123,10 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener, D
                         serviceIntent.putExtra("titleObj", title)
                         startForegroundService(requireContext(),serviceIntent)
                     }*/
+                    //Log.d("email", emailAdvert)
+                    //Log.d("title", title)
+                    val emptyMap = HashMap<String, String>()
+                    db.collection("Chat").document("${emailAdvert}_${title}").collection("chat").document().set(emptyMap)
                     db.collection("Chat").document("${emailAdvert}_${title}").collection("chat").addSnapshotListener{
                             snapshots, e ->
                         if (e != null) {
@@ -134,6 +138,8 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener, D
                             when (dc.type) {
                                 DocumentChange.Type.ADDED -> {
                                     createNotification("Chat", dc.document.id,title,emailAdvert)
+                                    Log.d("email", emailAdvert)
+                                    Log.d("title", title)
                                 }
                                 DocumentChange.Type.MODIFIED -> {createNotification("Chat", dc.document.id,title,emailAdvert)}
                                 DocumentChange.Type.REMOVED -> {}
@@ -168,6 +174,8 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener, D
         notificationManager.createNotificationChannel(channel)
 
         val resultIntent = Intent(requireContext(), ChatUsers::class.java)
+        Log.d("email", email)
+        Log.d("title", nameObj)
         resultIntent.putExtra("uidCompr", uid)
         resultIntent.putExtra("nomeObj", nameObj)
         resultIntent.putExtra("emailObj", email)
