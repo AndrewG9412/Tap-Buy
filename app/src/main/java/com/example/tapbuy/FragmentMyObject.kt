@@ -135,7 +135,7 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener, D
                                 DocumentChange.Type.ADDED -> {
                                     createNotification("Chat", dc.document.id,title,emailAdvert)
                                 }
-                                DocumentChange.Type.MODIFIED -> {createNotification("Chat", dc.document.id,title,emailAdvert)}
+                                DocumentChange.Type.MODIFIED -> {createNotification("Chat", dc.document.id, title,emailAdvert)}
                                 DocumentChange.Type.REMOVED -> {}
                             }
                         }
