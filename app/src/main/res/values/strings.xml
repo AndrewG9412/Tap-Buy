@@ -72,6 +72,7 @@
     <string name="listCat">Modifica categorie :</string>
     <string name="newCat">Nuova categoria :</string>
     <string name="new_name_cat">Nuovo nome categoria</string>
+    <string name="insert_image">Inserisci immagine</string>
 
     <string-array name="Price_choose">
         <item>Prezzo massimo:</item>

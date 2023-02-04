@@ -202,6 +202,10 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
 
 
     private fun checkData() : Boolean {
+        if (imageObj.drawable == null){
+            Toast.makeText(requireContext(), getString(R.string.insert_image), Toast.LENGTH_LONG).show()
+            return false
+        }
         if (ETtitleObj.text.isEmpty()){
             Toast.makeText(requireContext(), getString(R.string.insert_title), Toast.LENGTH_LONG).show()
             return false

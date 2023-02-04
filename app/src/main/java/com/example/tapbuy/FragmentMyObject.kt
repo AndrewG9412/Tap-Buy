@@ -133,7 +133,6 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener, D
                         for (dc in snapshots!!.documentChanges) {
                             when (dc.type) {
                                 DocumentChange.Type.ADDED -> {
-                                    //Log.d("quoteListener", "New quote: ${dc.document.data}")
                                     createNotification("Chat", dc.document.id,title)
                                 }
                                 DocumentChange.Type.MODIFIED -> {createNotification("Chat", dc.document.id,title)}
@@ -175,13 +174,14 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener, D
             requireContext(),
             0,
             resultIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_IMMUTABLE
         )
         val notification = Notification.Builder(requireContext(),
             channelId)
             .setContentTitle(getString(R.string.received_message))
             .setContentText("${getString(R.string.message_for)} ${nameObj}")
             .setChannelId(channelId)
+            .setSmallIcon(R.drawable.image)
             .setContentIntent(pendingIntent)
             .build()
 
