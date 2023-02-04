@@ -100,8 +100,12 @@ class ChatUsers : AppCompatActivity() {
             "user" to auth.currentUser?.email.toString(),
             "message" to sendMessage.text.toString(),
         )
-        db.collection("Chat").document("${emailObj}_${nomeObj}")
-            .collection("chat").document(uidCompr).collection("message").document("messaggio").set(messaggio)
+        val emptyMap = HashMap<String, String>()
+        val ref = db.collection("Chat").document("${emailObj}_${nomeObj}")
+            .collection("chat").document(uidCompr)
+        ref.set(emptyMap)
+        ref.collection("message").document("messaggio").set(messaggio)
+
     }
 
     override fun onResume() {
@@ -109,6 +113,7 @@ class ChatUsers : AppCompatActivity() {
 
         sendButton.setOnClickListener{
             if (uidCompr == auth.currentUser?.uid.toString()){
+                createMess()
                 db.collection("Chat").document("${emailObj}_${nomeObj}")
                     .collection("chat").document(uidCompr).collection("message").addSnapshotListener{snapshots, e ->
                         if (e != null) {
@@ -130,7 +135,7 @@ class ChatUsers : AppCompatActivity() {
                         }
 
                     }
-                createMess()
+                //createMess()
             }
             else {
                 createMess()
