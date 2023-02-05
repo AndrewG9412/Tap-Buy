@@ -102,6 +102,7 @@ class ViewObject : AppCompatActivity() {
 
         btnContact.setOnClickListener{
             val intent = Intent(this, ChatUsers::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
             intent.putExtra("nomeObj", intentObject.title )
             intent.putExtra("emailObj", intentObject.email)
             intent.putExtra("uidCompr", auth.currentUser?.uid.toString())

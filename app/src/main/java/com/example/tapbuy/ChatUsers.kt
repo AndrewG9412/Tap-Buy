@@ -100,10 +100,10 @@ class ChatUsers : AppCompatActivity() {
             "user" to auth.currentUser?.email.toString(),
             "message" to sendMessage.text.toString(),
         )
-        val emptyMap = HashMap<String, String>()
+        val map = HashMap<String, String>()
         val ref = db.collection("Chat").document("${emailObj}_${nomeObj}")
             .collection("chat").document(uidCompr)
-        ref.set(emptyMap)
+        ref.set(map)
         ref.collection("message").document("messaggio").set(messaggio)
 
     }
@@ -115,27 +115,31 @@ class ChatUsers : AppCompatActivity() {
             if (uidCompr == auth.currentUser?.uid.toString()){
                 createMess()
                 db.collection("Chat").document("${emailObj}_${nomeObj}")
-                    .collection("chat").document(uidCompr).collection("message").addSnapshotListener{snapshots, e ->
+                    .collection("chat").document(uidCompr).collection("message").addSnapshotListener { snapshots, e ->
                         if (e != null) {
                             return@addSnapshotListener
                         }
                         for (dc in snapshots!!.documentChanges) {
                             when (dc.type) {
                                 DocumentChange.Type.ADDED -> {
-                                    tvUserSays.text = String.format(resources.getString(R.string.userSays), dc.document.data["user"].toString())
+                                    tvUserSays.text = String.format(
+                                        resources.getString(R.string.userSays),
+                                        dc.document.data["user"].toString()
+                                    )
                                     tvReceivedMessage.text = dc.document.data["message"].toString()
                                 }
                                 DocumentChange.Type.MODIFIED -> {
-                                    tvUserSays.text = String.format(resources.getString(R.string.userSays), dc.document.data["user"].toString())
+                                    tvUserSays.text = String.format(
+                                        resources.getString(R.string.userSays),
+                                        dc.document.data["user"].toString()
+                                    )
                                     tvReceivedMessage.text = dc.document.data["message"].toString()
                                 }
                                 DocumentChange.Type.REMOVED -> {
                                 }
                             }
                         }
-
                     }
-                //createMess()
             }
             else {
                 createMess()

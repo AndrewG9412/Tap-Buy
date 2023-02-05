@@ -114,17 +114,6 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener, D
                     val selled = document.data.getValue("venduto").toString()
                     val mailVendAuth = document.data.getValue("mailVendAuth").toString()
                     obj = MyObject(photo,title,price,category,address,description,condition,emailAdvert,phone,expedition, selled, mailVendAuth)
-                    /*if (!foregroundServiceRunning()) {
-                        val serviceIntent = Intent(
-                            requireContext(),
-                            ListenerForegroundChat::class.java
-                        )
-                        serviceIntent.putExtra("emailSeller", mailVendAuth )
-                        serviceIntent.putExtra("titleObj", title)
-                        startForegroundService(requireContext(),serviceIntent)
-                    }*/
-                    //Log.d("email", emailAdvert)
-                    //Log.d("title", title)
                     val emptyMap = HashMap<String, String>()
                     db.collection("Chat").document("${emailAdvert}_${title}").collection("chat").document().set(emptyMap)
                     db.collection("Chat").document("${emailAdvert}_${title}").collection("chat").addSnapshotListener{
@@ -133,31 +122,20 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener, D
                             Log.d(TAG, "Cannot listen on firestore!!.")
                             return@addSnapshotListener
                         }
-
                         for (dc in snapshots!!.documentChanges) {
                             when (dc.type) {
                                 DocumentChange.Type.ADDED -> {
                                     createNotification("Chat", dc.document.id,title,emailAdvert)
-                                    Log.d("email", emailAdvert)
-                                    Log.d("title", title)
                                 }
-                                DocumentChange.Type.MODIFIED -> {createNotification("Chat", dc.document.id, title,emailAdvert)}
+                                DocumentChange.Type.MODIFIED -> {
+                                    createNotification("Chat", dc.document.id, title,emailAdvert)
+                                }
                                 DocumentChange.Type.REMOVED -> {}
                             }
                         }
                     }
                     listMyObject.add(obj)
                 }
-                /*val CHANNELID = "In ascolto dei messaggi dai possibili compratori"
-                val channel = NotificationChannel(CHANNELID, CHANNELID, NotificationManager.IMPORTANCE_LOW)
-                requireContext().getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
-                val notification: Notification.Builder = Notification.Builder(requireContext(), CHANNELID)
-                    .setContentText("Service is running")
-                    .setContentTitle("Service enabled")
-                startForeground(1001, notification.build())
-
-                 */
-
 
                 callback.oneDataDownloaded(listMyObject)
             }
@@ -174,8 +152,7 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener, D
         notificationManager.createNotificationChannel(channel)
 
         val resultIntent = Intent(requireContext(), ChatUsers::class.java)
-        Log.d("email", email)
-        Log.d("title", nameObj)
+        resultIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
         resultIntent.putExtra("uidCompr", uid)
         resultIntent.putExtra("nomeObj", nameObj)
         resultIntent.putExtra("emailObj", email)
@@ -183,9 +160,9 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener, D
 
         val pendingIntent = PendingIntent.getActivity(
             requireContext(),
-            0,
+            System.currentTimeMillis().toInt(),
             resultIntent,
-            PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
         val notification = Notification.Builder(requireContext(),
             channelId)
@@ -195,23 +172,10 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener, D
             .setSmallIcon(R.drawable.image)
             .setContentIntent(pendingIntent)
             .build()
-
-        notificationManager.notify(1000, notification)
+        val m = System.currentTimeMillis().toInt()
+        notificationManager.notify(m, notification)
     }
 
-
-    /*
-    fun foregroundServiceRunning(): Boolean {
-        val activityManager = requireContext().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager?
-        @Suppress("DEPRECATION")
-        for (service in activityManager!!.getRunningServices(Int.MAX_VALUE)) {
-            if (ListenerForegroundChat::class.java.name == service.service.className) {
-                return true
-            }
-        }
-        return false
-    }
-     */
     override fun onItemClick(view: View?, position: Int) {
         val clickedObj = listMyObject[position]
         val intent = Intent(context, ViewObject::class.java)
@@ -220,7 +184,6 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener, D
     }
 
     override fun oneDataDownloaded(data: ArrayList<MyObject>) {
-
         adapterRecycle = AdapterRecycleMyObject(context, data)
         recyclerViewMyObject.adapter = adapterRecycle
         adapterRecycle.setClickListener(this)

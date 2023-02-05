@@ -404,11 +404,6 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener, Do
         val intent = Intent(this, ViewObject::class.java)
         intent.putExtra("obj", obj)
         startActivity(intent)
-
-        /*val serviceIntent = Intent(requireContext(), ListenerForegroundChat::class.java)
-        serviceIntent.putExtra("emailSeller", emailObj )
-        serviceIntent.putExtra("titleObj", titleObj )
-        startForegroundService(requireContext(), serviceIntent)*/
     }
 
     fun foregroundServiceRunning(): Boolean {
@@ -464,17 +459,6 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener, Do
             }
         }
     }
-
-    /*
-    fun retrieveLocationAsync(context : Context, coordinates : LatLng) : String{
-        val geocoder = Geocoder(context)
-        lateinit var indirizzo : String
-        val geocodeMatches =
-            geocoder.getFromLocation(coordinates.latitude, coordinates.longitude, 1) as List<Address>
-        indirizzo = geocodeMatches[0].getAddressLine(0)
-        return indirizzo
-    }
-    */
     internal class WorkerLocationClass(appContext: Context, workerParams: WorkerParameters): Worker(appContext, workerParams) {
 
         var context : Context

@@ -410,15 +410,6 @@ class FragmentNewAdvert : Fragment(), DownloadCategoryCallback, UploadImageOnSto
             .addOnFailureListener { e ->
                 Log.w(TAG, "Errore aggiunta oggetto: $e", e)
             }
-
-
-        //db.collection("Chat").document(auth.currentUser?.email.toString()).collection("oggetti").document(
-         //   titleObj).collection("chat").document(auth.currentUser?.uid.toString()).set(mapChat)
-       // val serviceIntent = Intent(requireContext(), ListenerForegroundChat::class.java)
-      //  serviceIntent.putExtra("emailSeller", emailObj )
-        //serviceIntent.putExtra("titleObj", titleObj )
-        //startForegroundService(requireContext(), serviceIntent)
-
         startActivity(Intent(requireContext(), LandingActivityUser::class.java))
     }
     companion object {

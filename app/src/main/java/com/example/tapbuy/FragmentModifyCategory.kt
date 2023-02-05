@@ -140,4 +140,3 @@ class FragmentModifyCategory : Fragment(), DownloadCategoryCallback, AdapterRecy
         startActivity(intent)
     }
 }
-//data class Category(val name : String)

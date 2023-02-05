@@ -18,11 +18,13 @@
         android:id="@+id/btnModCat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/modifyCat"
-        android:layout_margin="20dp"
         android:layout_below="@+id/etModCat"
         android:layout_centerHorizontal="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
         android:backgroundTint="@color/dark_green"
-        />
+        android:text="@string/modifyCat" />
 
 </RelativeLayout>

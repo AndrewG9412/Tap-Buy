@@ -73,7 +73,7 @@ class FragmentSearch : Fragment(), AdapterRecycleSearch.ItemClickListener, Downl
 
     private lateinit var coordinatesBuyer : LatLng
     private lateinit var checkList : ArrayList<Boolean>
-    private lateinit var mySavedResearch: HashSet<String>
+    private lateinit var mySavedResearch : ArrayList<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,6 +86,8 @@ class FragmentSearch : Fragment(), AdapterRecycleSearch.ItemClickListener, Downl
         db = Firebase.firestore
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
         retrieveMail()
+
+        mySavedResearch = arrayListOf()
     }
 
     override fun onCreateView(
@@ -181,11 +183,17 @@ class FragmentSearch : Fragment(), AdapterRecycleSearch.ItemClickListener, Downl
     }
 
     private fun saveResearch(){
+        val setSaved = sharedPref.getStringSet("mySavedResearch", null)
+        for (research in setSaved!!.iterator()) mySavedResearch.add(research)
+        Log.d(TAG, mySavedResearch.toSet().toString())
         editor = sharedPref.edit()
         val gson = Gson()
-        val json: String = gson.toJson(MySavedResearch(editName.text.toString(), editDistance.text.toString().toInt(), editPrice.text.toString(), valExpedition ))
+        val json : String = gson.toJson(MySavedResearch(if(editName.text.isNotEmpty()) editName.text.toString() else null , if (editDistance.text.isNotEmpty()) editDistance.text.toString().toInt() else null,
+            if (editPrice.text.isNotEmpty()) editPrice.text.toString() else null, valExpedition ))
+        Log.d(TAG, json)
         mySavedResearch.add(json)
-        editor.putStringSet("mySavedResearch", mySavedResearch )
+        editor.putStringSet("mySavedResearch", mySavedResearch.toSet() )
+        Log.d(TAG, mySavedResearch.toSet().toString())
         editor.apply()
     }
 
@@ -195,7 +203,7 @@ class FragmentSearch : Fragment(), AdapterRecycleSearch.ItemClickListener, Downl
         numerirange = editPrice.text.toString().split("-")
         for (mail in listMail){
             db.collection("Oggetti").document(mail)
-                .collection("miei_oggetti")/*.whereArrayContains("spedire", valExpedition)*/.get()
+                .collection("miei_oggetti").get()
                 .addOnSuccessListener {
                     for (obj in it) {
                         checkList = arrayListOf()
@@ -334,10 +342,6 @@ class FragmentSearch : Fragment(), AdapterRecycleSearch.ItemClickListener, Downl
                 LOCATION_REQUEST_CODE
             )
         }
-    }
-
-    private fun calculateDistance(latitudeBuyer : String, longitudeeBuyer : String, latitudeObj : String, longitudeObj : String ){
-
     }
 
     private fun requestPermission(permissionType: String, requestCode: Int) {
