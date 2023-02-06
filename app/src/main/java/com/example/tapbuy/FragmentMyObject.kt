@@ -114,8 +114,6 @@ class FragmentMyObject : Fragment(), AdapterRecycleMyObject.ItemClickListener, D
                     val selled = document.data.getValue("venduto").toString()
                     val mailVendAuth = document.data.getValue("mailVendAuth").toString()
                     obj = MyObject(photo,title,price,category,address,description,condition,emailAdvert,phone,expedition, selled, mailVendAuth)
-                    val emptyMap = HashMap<String, String>()
-                    db.collection("Chat").document("${emailAdvert}_${title}").collection("chat").document().set(emptyMap)
                     db.collection("Chat").document("${emailAdvert}_${title}").collection("chat").addSnapshotListener{
                             snapshots, e ->
                         if (e != null) {
