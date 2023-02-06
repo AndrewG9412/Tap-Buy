@@ -26,11 +26,11 @@ class ManageSavedResearchActivity : AppCompatActivity(){
 
         val setSaved = sharedPref.getStringSet("mySavedResearch", null)
 
-        for (research in setSaved!!.iterator()){
+        /*for (research in setSaved!!.iterator()){
             val arrayJson = research.toString().split(",")
             arrayJson.
             MySavedResearch(research.)
-        }
+        }*/
 
         val arraySaved : ArrayList<String> = setSaved?.toList()  as ArrayList<String>
         for (line in arraySaved)
