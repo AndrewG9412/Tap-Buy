@@ -388,8 +388,6 @@ class ModifyObject : AppCompatActivity(), AdapterView.OnItemSelectedListener, Do
             "spedire" to expeditionObj,
             "venduto" to selled,
             "mailVendAuth" to email,
-            "latitudine" to latitude,
-            "logitudine" to longitude
         )
         val obj = MyObject(downloadUrlImage,titleObj,priceObj,categoryObj,addressObj,descriptionObj,conditionObj,emailObj,phoneObj,expeditionObj, selled, email)
         db.collection("Oggetti").document(email)
